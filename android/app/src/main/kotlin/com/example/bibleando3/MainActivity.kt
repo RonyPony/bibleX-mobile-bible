@@ -1,4 +1,4 @@
-package com.example.bibleando3
+package com.ronytuquizz.bibleando3
 
 import io.flutter.embedding.android.FlutterActivity
 

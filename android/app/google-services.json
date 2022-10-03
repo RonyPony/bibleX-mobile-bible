@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "69385362933",
+    "project_id": "biblexmovil",
+    "storage_bucket": "biblexmovil.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:69385362933:android:08a5d3b4f33cd5ccdad4bc",
+        "android_client_info": {
+          "package_name": "com.ronytuquizz.bibleando3"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "69385362933-661j4m3qh01jb8rou5l9vboduui4fn21.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfJpFcQOsoMmSmVkdytU8y21T0lbLFRks"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "69385362933-661j4m3qh01jb8rou5l9vboduui4fn21.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

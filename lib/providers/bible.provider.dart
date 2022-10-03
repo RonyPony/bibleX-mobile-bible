@@ -1,17 +1,30 @@
+
+import 'package:bibleando3/contracts/auth.contract.dart';
 import 'package:bibleando3/contracts/bible.contract.dart';
 import 'package:bibleando3/models/bible.dart';
+import 'package:bibleando3/models/favorite.dart';
 import 'package:bibleando3/models/versiculo.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../models/book.dart';
 import '../models/capitulos.dart';
 
 class BibleProvider with ChangeNotifier {
   BibleContract _contract;
-  BibleProvider(this._contract);
+  AuthContract _authContract;
+  BibleProvider(this._contract,this._authContract);
 
   Future<List<Bible>> getAllBibles() async {
     final result = await _contract.getAllBibles();
+    return result;
+  } 
+
+  Future<List<Favorite>> getFavorites() async {
+    User x =await  _authContract.getCurrentUser();
+    var result = await _contract.getFavorites(x);
     return result;
   } 
 

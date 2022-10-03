@@ -1,24 +1,29 @@
 import 'package:bibleando3/contracts/bible.contract.dart';
+import 'package:bibleando3/firebase_constants.dart';
 import 'package:bibleando3/models/bible.dart';
 import 'package:bibleando3/models/versiculo.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../helpers/network.util.dart';
 import '../models/book.dart';
 import '../models/capitulos.dart';
+import '../models/favorite.dart';
 import '../models/pasaje.dart';
 
 class BibleService implements BibleContract {
   final client = NetworkUtil.getClient();
-
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
   String savedCurrentVersionFlag = "CURRENTVERSIONFLAGX";
-  
-  String savedCurrentBookFlag="CURRENTBOOKFLAGX";
-  
-  String savedCurrentCharFlag="CURRENTCHARFLAGX";
-  
-  String savedCurrentVerseFlag="CURRENTVERSEFLAGX";
+
+  String savedCurrentBookFlag = "CURRENTBOOKFLAGX";
+
+  String savedCurrentCharFlag = "CURRENTCHARFLAGX";
+
+  String savedCurrentVerseFlag = "CURRENTVERSEFLAGX";
 
   @override
   Future<List<Bible>> getAllBibles() async {
@@ -134,7 +139,8 @@ class BibleService implements BibleContract {
     Response? response;
     List<Pasaje>? dataResponse;
     try {
-      response = await client.get('/bibles/$bibleId/passages/$passageId?content-type=text&include-notes=false&include-titles=false&include-chapter-numbers=false&include-verse-numbers=true&include-verse-spans=true&use-org-id=false');
+      response = await client.get(
+          '/bibles/$bibleId/passages/$passageId?content-type=text&include-notes=false&include-titles=false&include-chapter-numbers=false&include-verse-numbers=true&include-verse-spans=true&use-org-id=false');
       if (response.statusCode == 200) {
         var htmlTxt = response.data["data"]["content"];
         // dataResponse = List<Bible>.from(
@@ -205,7 +211,8 @@ class BibleService implements BibleContract {
     Response? response;
     List<Versiculo>? dataResponse;
     try {
-      response = await client.get('/bibles/$bibleId/chapters/$characterId/verses');
+      response =
+          await client.get('/bibles/$bibleId/chapters/$characterId/verses');
       if (response.statusCode == 200) {
         List? lista = response.data["data"];
         List<Versiculo> finalList = [];
@@ -255,7 +262,7 @@ class BibleService implements BibleContract {
           Capitulo bi = Capitulo();
           bi.id = bible["id"];
           bi.number = bible["number"];
-          if (bi.number!='intro') {
+          if (bi.number != 'intro') {
             finalList.add(bi);
           }
         }
@@ -298,7 +305,7 @@ class BibleService implements BibleContract {
       return false;
     }
   }
-  
+
   @override
   Future<bool> saveSelectedBook(String book) async {
     try {
@@ -310,7 +317,7 @@ class BibleService implements BibleContract {
       return false;
     }
   }
-  
+
   @override
   Future<String> getSelectedChar() async {
     final prefs = await SharedPreferences.getInstance();
@@ -318,7 +325,7 @@ class BibleService implements BibleContract {
     String finalVersion = res.toString();
     return finalVersion;
   }
-  
+
   @override
   Future<bool> saveSelectedChar(String char) async {
     try {
@@ -330,7 +337,7 @@ class BibleService implements BibleContract {
       return false;
     }
   }
-  
+
   @override
   Future<bool> saveSelectedVerse(String verse) async {
     try {
@@ -342,5 +349,32 @@ class BibleService implements BibleContract {
       return false;
     }
   }
-  
+
+  @override
+  Future<List<Favorite>> getFavorites(User firebaseUser) async {
+    List<Favorite> favorites = [];
+    final QuerySnapshot result = await firestore
+        .collection(FirestoreConstants.pathFavoritesVersesCollection)
+        
+        .where(FirestoreConstants.userId, isEqualTo: firebaseUser.uid)
+        .get();
+    final List<DocumentSnapshot> document = result.docs;
+    for (DocumentSnapshot doc in result.docs) {
+      print(doc.data());
+      favorites.add(Favorite.fromJson(doc.data() as Map<String,dynamic>));
+    }
+    // if (document.isEmpty) {
+    //   firestore
+    //       .collection(FirestoreConstants.pathUserCollection)
+    //       .doc(firebaseUser.uid)
+    //       .set({
+    //     FirestoreConstants.displayName: firebaseUser.displayName,
+    //     FirestoreConstants.photoUrl: firebaseUser.photoURL,
+    //     FirestoreConstants.id: firebaseUser.uid,
+    //     "createdAt: ": DateTime.now().millisecondsSinceEpoch.toString(),
+    //     FirestoreConstants.chattingWith: null
+    //   });
+    // }
+    return favorites;
+  }
 }

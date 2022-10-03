@@ -21,7 +21,7 @@ class _stateHomeScreen extends State<HomeScreen> {
   Future<List<DropdownMenuItem>>? listaLibros;
   Future<List<DropdownMenuItem>>? listaCapitulos;
   Future<List<DropdownMenuItem>>? listaVersiculos;
-
+  bool canAddToFavorite = false;
   Object? selectedVersion = "592420522e16049f-01";
   Object? selectedBook = ""; //"GEN";
   Object? selectedChar = ""; //"GEN.1";
@@ -44,6 +44,7 @@ class _stateHomeScreen extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       persistentFooterButtons: [BottomMenu(currentIndex: 0)],
+      // appBar: AppBar(),
       body: Stack(
         children: [
           Container(
@@ -123,6 +124,7 @@ class _stateHomeScreen extends State<HomeScreen> {
                                       // selectedBook="";
                                       // selectedChar = "";
                                       // selectedVerse="";
+                                      canAddToFavorite=false;
                                       print("Bible selected >" +
                                           newValue.toString());
                                       selectedBook = "";
@@ -164,15 +166,19 @@ class _stateHomeScreen extends State<HomeScreen> {
           SafeArea(
               child: Padding(
             padding: const EdgeInsets.only(left: 20),
-            child: Row(
+            child: Column(
               children: [
-                Text(
-                  "Bible",
-                  style: TextStyle(color: Colors.white, fontSize: 45),
-                ),
-                Text(
-                  "x",
-                  style: TextStyle(color: Colors.red, fontSize: 47),
+                Row(
+                  children: [
+                    Text(
+                      "Bible",
+                      style: TextStyle(color: Colors.white, fontSize: 45),
+                    ),
+                    Text(
+                      "x",
+                      style: TextStyle(color: Colors.red, fontSize: 47),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -248,6 +254,7 @@ class _stateHomeScreen extends State<HomeScreen> {
                                   _bibleProvider.saveSelectedBook(
                                       selectedBook.toString());
                                   listaCapitulos = getAllChapters();
+                                  canAddToFavorite = false;
                                 });
                               });
                         }
@@ -334,6 +341,7 @@ class _stateHomeScreen extends State<HomeScreen> {
                                       selectedChar.toString());
                                   // selectedVerse = "";
                                   listaVersiculos = getAllVerses();
+                                  canAddToFavorite = false;
                                 });
                               });
                         }
@@ -394,6 +402,7 @@ class _stateHomeScreen extends State<HomeScreen> {
                                   _bibleProvider.saveSelectedVerse(
                                       selectedVerse.toString());
                                   refreshText();
+                                  canAddToFavorite=true;
                                 });
                               });
                         }
@@ -435,10 +444,12 @@ class _stateHomeScreen extends State<HomeScreen> {
                           ),
                         ]),
                     child: SingleChildScrollView(
-                        child: Text(
+                        child: 
+                        Text(
                       _currentText,
-                      style: TextStyle(fontSize: 25),
-                    ))),
+                      style: TextStyle(fontSize: 25),)
+                      // Html(),
+                      )),
                 Padding(
                   padding: const EdgeInsets.only(top: 20),
                   child: Row(
@@ -483,10 +494,17 @@ class _stateHomeScreen extends State<HomeScreen> {
                       GestureDetector(
                         onTap: () {
                           //TODO add to favorite
+                          
                         },
                         child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width / 4),
-                          child: Icon(Icons.star_border,size: 45,color: Colors.blue,),
+                          padding: EdgeInsets.symmetric(
+                              horizontal:
+                                  MediaQuery.of(context).size.width / 4),
+                          child: Icon(
+                            Icons.star_border,
+                            size: 45,
+                            color: canAddToFavorite?Colors.blue:Colors.grey,
+                          ),
                         ),
                       ),
                       GestureDetector(

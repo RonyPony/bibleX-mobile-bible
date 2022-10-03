@@ -1,9 +1,16 @@
+import 'package:bibleando3/models/credentials.dart';
+import 'package:bibleando3/models/processResponse.dart';
+import 'package:bibleando3/providers/auth.provider.dart';
+import 'package:bibleando3/screens/home.dart';
 import 'package:bibleando3/screens/register.dart';
 import 'package:bibleando3/widgets/linkBtn.dart';
 import 'package:bibleando3/widgets/mainBtn.dart';
+import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 
 import '../widgets/textBox.dart';
 
@@ -14,8 +21,22 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+
+  TextEditingController emailController = TextEditingController(text: "ronel.cruz.a8@gmail.com");
+  TextEditingController passwordController = TextEditingController(text: "ronel0808");
+  
   bool rememberme = false;
 
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft
+    ]);
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,9 +60,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    _buildSkiptBtn(),
                     _buildLabel(),
                     _buildForm(),
                     _buildMainBtn(),
+                    
                     _buildRegisterBtn(),
                   ],
                 ),
@@ -54,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildLabel() {
     return Padding(
       padding: EdgeInsets.only(
-          left: 20, top: MediaQuery.of(context).size.height / 6),
+          left: 20, top: MediaQuery.of(context).size.height / 8),
       child: SafeArea(
         child: Row(
           children: [
@@ -70,8 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildForm() {
-    TextEditingController emailController = TextEditingController();
-    TextEditingController passwordController = TextEditingController();
+    
 
     return Container(
       width: MediaQuery.of(context).size.width * .9,
@@ -82,8 +104,8 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           children: [
             _buildTextField(
-                "Correo Electronico", Icons.email_rounded, emailController),
-            _buildTextField("Clave", Icons.lock, passwordController),
+                "Correo Electronico", Icons.email_rounded, emailController,false),
+            _buildTextField("Clave", Icons.lock, passwordController,true),
             _buildRememberme()
           ],
         ),
@@ -92,10 +114,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildTextField(
-      String label, IconData icon, TextEditingController controller) {
+      String label, IconData icon, TextEditingController controller,bool isPass) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: CustomTextBox(
+        isPassword: isPass,
           text: label,
           controller: controller,
           onChange: () {},
@@ -107,7 +130,38 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildMainBtn() {
-    return MainButton(text: "Acceder", onPressed: () {});
+    return MainButton(text: "Acceder", onPressed: () async {
+      final provider = Provider.of<AuthProvider>(context,listen: false);
+      Credentials info = Credentials(emailController.text, passwordController.text);
+      ProcessResponse authenticated = await provider.signin(info);
+      if (!authenticated.success!) {
+        CoolAlert.show(context: context,backgroundColor: Colors.white, type: CoolAlertType.error,title: "Ups, algo paso",text: authenticated.errorMessage);
+      }else{
+        Navigator.pushNamedAndRemoveUntil(context,HomeScreen.routeName, (route) => false);
+      }
+    });
+  }
+  Widget _buildSkiptBtn() {
+    return SafeArea(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          GestureDetector(
+            child: Row(
+              children: [
+                
+                Text("Saltar",style: TextStyle(color: Colors.white,fontSize: 20),),
+                Icon(Icons.arrow_forward_ios_rounded,color: Colors.white,)
+              ],
+            ),
+            onTap: () {
+              Navigator.pushNamedAndRemoveUntil(
+                  context, HomeScreen.routeName, (route) => false);
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildRegisterBtn() {
@@ -158,6 +212,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: !rememberme
                       ? Color.fromRGBO(174, 174, 174, 100)
                       : Colors.green,
+                  fontWeight: rememberme
+                      ? FontWeight.bold
+                      : FontWeight.normal,
                   fontSize: 18),
             ))
       ],

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:bibleando3/screens/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -50,10 +51,10 @@ class _BottomMenuState extends State<BottomMenu> {
           Navigator.pushNamedAndRemoveUntil(
               context, FavoriteScreen.routeName, (route) => false);
         }
-        // if (index == 2) {
-        //   Navigator.pushNamedAndRemoveUntil(
-        //       context, ProfileScreen.routeName, (route) => false);
-        // }
+        if (index == 2) {
+          Navigator.pushNamedAndRemoveUntil(
+              context, SettingScreen.routeName, (route) => false);
+        }
         _selectedIndex = index;
       }
     });
@@ -99,13 +100,13 @@ class _BottomMenuState extends State<BottomMenu> {
                   ),
                   label: 'Favorite',
                 ),
-                // BottomNavigationBarItem(
-                //   icon: Icon(
-                //     Icons.person,
-                //     size: 35,
-                //   ),
-                //   label: 'Profile',
-                // ),
+                BottomNavigationBarItem(
+                  icon: Icon(
+                    Icons.settings,
+                    size: 35,
+                  ),
+                  label: 'Settings',
+                ),
               ],
               currentIndex: _selectedIndex,
               unselectedItemColor: Color(0xffcccccc),

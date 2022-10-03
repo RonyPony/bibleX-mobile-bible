@@ -1,4 +1,6 @@
+import 'package:bibleando3/models/favorite.dart';
 import 'package:bibleando3/models/versiculo.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/bible.dart';
 import '../models/book.dart';
@@ -10,6 +12,7 @@ abstract class BibleContract {
   Future<String>getBookName(String bookId);
   Future<String>getPassage(String bibleId, String passageId);
   Future<String> getLongPassage();
+  Future<List<Favorite>>getFavorites(User CurrentUser);
   Future<String> getSelectedBook();
   Future<bool> saveSelectedBook(String book);
   Future<String> getChar();

@@ -1,20 +1,29 @@
+import 'package:bibleando3/models/processResponse.dart';
+import 'package:bibleando3/providers/auth.provider.dart';
 import 'package:bibleando3/screens/login.dart';
 import 'package:bibleando3/screens/registerCompleted.dart';
+import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 
 import '../widgets/linkBtn.dart';
 import '../widgets/mainBtn.dart';
 import '../widgets/textBox.dart';
 
 class RegisterScreen extends StatefulWidget {
-  static String routeName="/registerScreen";
+  static String routeName = "/registerScreen";
   @override
-  State<RegisterScreen> createState()=>_RegisterScreenState();
-  
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen>{
+class _RegisterScreenState extends State<RegisterScreen> {
+  TextEditingController nameController = TextEditingController();
+  TextEditingController lastnameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController ageController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,12 +57,11 @@ class _RegisterScreenState extends State<RegisterScreen>{
             ),
           )),
     );
-  } 
+  }
 
   Widget _buildLabel() {
     return Padding(
-      padding: EdgeInsets.only(
-          left: 20, top: 40),
+      padding: EdgeInsets.only(left: 20, top: 40),
       child: SafeArea(
         child: Row(
           children: [
@@ -69,12 +77,6 @@ class _RegisterScreenState extends State<RegisterScreen>{
   }
 
   Widget _buildForm() {
-    TextEditingController nameController = TextEditingController();
-    TextEditingController lastnameController = TextEditingController();
-    TextEditingController emailController = TextEditingController();
-    TextEditingController ageController = TextEditingController();
-    TextEditingController passwordController = TextEditingController();
-
     return Container(
       width: MediaQuery.of(context).size.width * .9,
       decoration: BoxDecoration(
@@ -83,15 +85,15 @@ class _RegisterScreenState extends State<RegisterScreen>{
         padding: const EdgeInsets.all(10),
         child: Column(
           children: [
+            _buildTextField("Nombre", Icons.person, nameController),
+            _buildTextField("Apellidos", Icons.supervised_user_circle_rounded,
+                lastnameController),
             _buildTextField(
-                "Nombre", Icons.person, nameController),
-            _buildTextField("Apellidos", Icons.supervised_user_circle_rounded, lastnameController),
-            _buildTextField("Correo Electronico", Icons.mark_email_read,
-                emailController),
-                _buildTextField("Fecha de Nacimiento", Icons.date_range,
-                ageController),
-                _buildTextField("Clave", Icons.lock_clock_outlined,
-                passwordController),
+                "Correo Electronico", Icons.mark_email_read, emailController),
+            _buildTextField(
+                "Fecha de Nacimiento", Icons.date_range, ageController),
+            _buildTextField(
+                "Clave", Icons.lock_clock_outlined, passwordController),
           ],
         ),
       ),
@@ -114,9 +116,24 @@ class _RegisterScreenState extends State<RegisterScreen>{
   }
 
   Widget _buildMainBtn() {
-    return MainButton(text: "Registrate", onPressed: () {
-      Navigator.pushNamedAndRemoveUntil(context, RegisterCompletedScreen.routeName, (route) => false);
-    });
+    return MainButton(
+        text: "Registrate",
+        onPressed: () async {
+          final _auth = Provider.of<AuthProvider>(context, listen: false);
+          ProcessResponse registered = await _auth.registerUser(
+              emailController.text, passwordController.text);
+          if (registered.success!) {
+            Navigator.pushNamedAndRemoveUntil(
+                context, RegisterCompletedScreen.routeName, (route) => false);
+          } else {
+            CoolAlert.show(
+              context: context,
+              title: "Hey, algo paso!",
+              type: CoolAlertType.error,
+              text: registered.errorMessage,
+            );
+          }
+        });
   }
 
   Widget _buildRegisterBtn() {

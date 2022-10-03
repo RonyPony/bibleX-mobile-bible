@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/diagnostics.dart';
 
 class CustomTextBox extends StatelessWidget {
+  
+
   const CustomTextBox({Key? key,required this.text,required this.controller, required this.onChange, this.isPassword=false, required this.svg}) : super(key: key);
   final String text;
  final bool isPassword;
@@ -10,6 +12,7 @@ class CustomTextBox extends StatelessWidget {
  final TextEditingController controller;
   @override
   Widget build(BuildContext context) {
+    bool _showPass=isPassword;
     return Container(
       width: MediaQuery.of(context).size.width*.9,
       height: 64,
@@ -37,14 +40,14 @@ class CustomTextBox extends StatelessWidget {
           ),
           Container(
             height: 50,
-            width: 260,
+            width: !isPassword?260:240,
             child: TextField(
               onChanged: onChange(),
               controller: controller,
               style: TextStyle(
                 color: Colors.white
               ),
-              obscureText: isPassword,
+              obscureText: isPassword && _showPass,
               decoration: InputDecoration(
                 hintText: text,
                 border: OutlineInputBorder(
@@ -58,7 +61,16 @@ class CustomTextBox extends StatelessWidget {
                 ),
               ),
             ),
-          )
+          ),
+          isPassword? GestureDetector(
+            onTap: () {
+              _showPass = true;
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(left: 0, right: 5),
+              // child: Icon(Icons.remove_red_eye,color: Colors.white,),
+            ),
+          ):SizedBox()
         ],
       ),
 );
