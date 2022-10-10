@@ -1,5 +1,7 @@
+import 'package:bibleando3/providers/auth.provider.dart';
 import 'package:bibleando3/providers/bible.provider.dart';
 import 'package:bibleando3/widgets/bottomMenu.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
@@ -8,6 +10,7 @@ import 'package:provider/provider.dart';
 import '../models/bible.dart';
 import '../models/book.dart';
 import '../models/capitulos.dart';
+import '../models/favorite.dart';
 import '../models/versiculo.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -492,9 +495,19 @@ class _stateHomeScreen extends State<HomeScreen> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () {
-                          //TODO add to favorite
-                          
+                        onTap: () async {
+                          if (canAddToFavorite) {
+                            final provider = Provider.of<BibleProvider>(context,listen: false);
+                            final auth_provider = Provider.of<AuthProvider>(context,listen: false);
+                            User usr = await auth_provider.getCurrentUser();
+                            Favorite fav = Favorite();
+                            fav.bibleId = await provider.getSelectedVersionLocally();
+                            fav.bibleName = await provider.getSelectedVersionLocally();
+                            fav.text = _currentText;
+                            fav.userId = usr.uid;
+                            fav.title=await provider.getSelectedVerse();
+                            var x =  provider.addFavorite(fav);
+                          }
                         },
                         child: Padding(
                           padding: EdgeInsets.symmetric(

@@ -353,15 +353,15 @@ class BibleService implements BibleContract {
   @override
   Future<List<Favorite>> getFavorites(User firebaseUser) async {
     List<Favorite> favorites = [];
+
     final QuerySnapshot result = await firestore
         .collection(FirestoreConstants.pathFavoritesVersesCollection)
-        
         .where(FirestoreConstants.userId, isEqualTo: firebaseUser.uid)
         .get();
     final List<DocumentSnapshot> document = result.docs;
     for (DocumentSnapshot doc in result.docs) {
       print(doc.data());
-      favorites.add(Favorite.fromJson(doc.data() as Map<String,dynamic>));
+      favorites.add(Favorite.fromJson(doc.data() as Map<String, dynamic>));
     }
     // if (document.isEmpty) {
     //   firestore
@@ -376,5 +376,69 @@ class BibleService implements BibleContract {
     //   });
     // }
     return favorites;
+  }
+
+  @override
+  Future<bool> addFavorite(Favorite fav) async {
+    CollectionReference users = FirebaseFirestore.instance
+        .collection(FirestoreConstants.pathFavoritesVersesCollection);
+    bool returningValue = false;
+    String currentBibleId = await getSelectedVersionLocally();
+    String currentBookId = await getSelectedBook();
+    String currentChapterId = await getSelectedChar();
+    List<Bible> bibles = [];
+    List<Versiculo> finalList = [];
+    finalList = await getVerses(currentBibleId, currentChapterId);
+    bibles = await getAllBibles();
+    String? bibleName = fav.bibleName;
+    for (Bible bible in bibles) {
+      bibleName =
+          bibles.where((element) => element.id == fav.bibleName).first.name;
+    }
+    String? ttl =
+        finalList.where((element) => element.id == fav.title).first.reference;
+    await users.add({
+      'bibleName': bibleName,
+      'bibleId': fav.bibleId,
+      'title': ttl,
+      'reference': fav.title,
+      'text': fav.text,
+      'userId': fav.userId
+    }).then((value) {
+      print("User Added");
+      returningValue = true;
+    }).catchError((error) {
+      print("Failed to add user: $error");
+      returningValue = false;
+    });
+    return returningValue;
+  }
+
+  @override
+  Future<bool> removeFavorite(String bibleId, String reference) async {
+   FirebaseFirestore.instance
+  .collection('users')
+  .doc("userId")
+  .collection('favourites')
+  .where('prod_id', isEqualTo: '')
+  .get()
+  .then((snapshot) {
+    // ... 
+  });
+//     var jobskill_query = FirebaseFirestore.instance.collection('job_skills').where('',isEqualTo: '');//'job_id','==',post.job_id);
+// jobskill_query.get().then(function(querySnapshot) {
+//   querySnapshot.forEach(function(doc) {
+//     doc.ref.delete();
+//   });
+// });
+
+    // Future<void> deleteUser() {
+    //   return users
+    //       .doc('T4VVZII33847PyQvrwSI')
+    //       .delete()
+    //       .then((value) => print("User Deleted"))
+    //       .catchError((error) => print("Failed to delete user: $error"));
+    // }
+    return true;
   }
 }

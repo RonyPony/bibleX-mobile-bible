@@ -13,20 +13,20 @@ class FavoriteScreen extends StatefulWidget {
 }
 
 class _FavoriteScreenState extends State<FavoriteScreen> {
-  List<Favorite>_favs=[];
+  List<Favorite> _favs = [];
+
+  bool editMode = false;
   @override
   void initState() {
     super.initState();
     // WidgetsBinding.instance.addPostFrameCallback((_) {
-      asyncInitState();
+    asyncInitState();
     // });
   }
 
   void asyncInitState() async {
-    _favs =await getFavs();
-    setState(() {
-      
-    });
+    _favs = await getFavs();
+    setState(() {});
   }
 
   @override
@@ -56,30 +56,31 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                   children: [
                     SafeArea(
                         child: Padding(
-                      padding: const EdgeInsets.only(top: 100, left: 150),
+                      padding: const EdgeInsets.only(top: 100, left: 250),
                       child: Container(
                         padding:
                             EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         width: 220,
-                        decoration: BoxDecoration(color: Colors.white),
+                        decoration: BoxDecoration(color: Colors.transparent),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
-                              "Edicion",
-                              style: TextStyle(color: Colors.blue),
-                            ),
-                            SizedBox(
-                              width: 20,
-                            ),
-                            Text(
-                              "Reina Valera",
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                            Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              size: 20,
-                              color: Colors.grey,
+                            GestureDetector(
+                              onTap: (() {
+                                editMode = !editMode;
+                                    setState(() {});
+                              }),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 10),
+                                decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: Text(
+                                  "Editar",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
                             )
                           ],
                         ),
@@ -121,23 +122,41 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
               itemCount: _favs.length,
               itemBuilder: (context, index) {
                 return Padding(
-                  padding: const EdgeInsets.only(left: 10,right: 10),
+                  padding:
+                      const EdgeInsets.only(left: 10, right: 10, bottom: 10),
                   child: Container(
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(10)
-                    ),
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10)),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        editMode? Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                          GestureDetector(
+                            onTap: () async {
+                              final provider = Provider.of<BibleProvider>(context,listen: false);
+                              // var x = await provider.removeFavorite(bibleId, reference);
+                              // TODO remove from favorite
+                            },
+                            child: Icon(
+                              Icons.close,
+                              color: Colors.white,
+                            ),
+                          )
+                        ]):SizedBox(),
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children: [
                               Text(
-                                _favs[index].title!,style: TextStyle(color: Colors.white,fontSize: 25),),
-                                
+                                _favs[index].title!,
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 25),
+                              ),
                             ],
                           ),
                         ),
@@ -174,11 +193,11 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
       ),
     );
   }
-  
-   getFavs() async {
-    final provider = Provider.of<BibleProvider>(context,listen: false);
+
+  getFavs() async {
+    final provider = Provider.of<BibleProvider>(context, listen: false);
     List<Favorite> x = await provider.getFavorites();
-     _favs = x;
+    _favs = x;
     return x;
   }
 }

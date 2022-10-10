@@ -28,6 +28,16 @@ class BibleProvider with ChangeNotifier {
     return result;
   } 
 
+  Future<bool> removeFavorite(String bibleId, String reference) async {
+    var result = await _contract.removeFavorite(bibleId,reference);
+    return result;
+  }
+
+  Future<bool> addFavorite(Favorite fav) async {
+    bool response = await _contract.addFavorite(fav);
+    return response;
+  }
+
   Future<bool> saveSelectedBook(String book) async {
     final result = await _contract.saveSelectedBook(book);
     return result;
