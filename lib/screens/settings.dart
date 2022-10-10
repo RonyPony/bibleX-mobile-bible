@@ -98,7 +98,7 @@ class _SettingState extends State<SettingScreen> {
           )),
           Padding(
             padding: const EdgeInsets.only(top: 150, left: 10),
-            child: SvgPicture.asset("assets/userHome.svg"),
+            child: SvgPicture.asset("assets/logo.svg"),
           ),
           Padding(
             padding: EdgeInsets.only(top: 250),
@@ -122,7 +122,21 @@ class _SettingState extends State<SettingScreen> {
                       },
                     ),
                   ),
-                  _buildLogoutBtn()
+                  FutureBuilder<Widget>(
+                    future: _buildLogoutBtn(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return Text("Err");
+                      }
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasData && snapshot.connectionState==ConnectionState.done) {
+                        return snapshot.data!;
+                      }
+                      return Text("No Data");
+                    },
+                  )
                 ],
               ),
             ),
@@ -138,7 +152,7 @@ class _SettingState extends State<SettingScreen> {
       child: Container(
         padding: EdgeInsets.all(10),
         decoration: BoxDecoration(
-            color: Colors.blue, borderRadius: BorderRadius.circular(10)),
+            color: Colors.grey, borderRadius: BorderRadius.circular(10)),
         child: Column(
           children: [
             Row(
@@ -157,10 +171,13 @@ class _SettingState extends State<SettingScreen> {
     );
   }
   
-  _buildLogoutBtn() {
+  Future<Widget>_buildLogoutBtn() async {
+    final authProvider = Provider.of<AuthProvider>(context,listen: false);
+    
+    bool isAuthenticated = await authProvider.isUserAuthenticated();
     return Padding(
       padding: const EdgeInsets.only(left: 10, right: 10),
-      child: GestureDetector(
+      child: isAuthenticated?GestureDetector(
         onTap: () async {
           final pro = Provider.of<AuthProvider>(context,listen: false);
           bool isOut = await pro.signout();
@@ -188,7 +205,33 @@ class _SettingState extends State<SettingScreen> {
             ],
           ),
         ),
-      ),
+      ): GestureDetector(
+              onTap: () async {
+                
+                Navigator.pushNamedAndRemoveUntil(
+                    context, LoginScreen.routeName, (route) => false);
+              },
+              child: Container(
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.red),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10)),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Iniciar Sesion",
+                          style: TextStyle(color: Colors.red, fontSize: 25),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
     );
   }
 }

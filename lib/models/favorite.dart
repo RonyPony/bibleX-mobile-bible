@@ -4,8 +4,9 @@ class Favorite {
   String? title;
   String? text;
   String? userId;
+  String? reference;
 
-  Favorite({this.bibleName, this.bibleId, this.title, this.text,this.userId});
+  Favorite({this.bibleName, this.bibleId, this.title, this.text,this.userId,this.reference});
 
   Favorite.fromJson(Map<String, dynamic> json) {
     bibleName = json['bibleName'];
@@ -13,6 +14,7 @@ class Favorite {
     title = json['title'];
     text = json['text'];
     userId = json['userId'];
+    reference=json['reference'];
   }
 
   Map<String, dynamic> toJson() {
@@ -22,6 +24,7 @@ class Favorite {
     data['title'] = this.title;
     data['text'] = this.text;
     data['userId']=this.userId;
+    data['reference']=this.reference;
     return data;
   }
 }

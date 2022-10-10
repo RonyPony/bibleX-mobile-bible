@@ -1,9 +1,12 @@
+// ignore_for_file: no_leading_underscores_for_local_identifiers, non_constant_identifier_names
+
 import 'package:bibleando3/providers/auth.provider.dart';
 import 'package:bibleando3/providers/bible.provider.dart';
 import 'package:bibleando3/widgets/bottomMenu.dart';
+import 'package:cool_alert/cool_alert.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
@@ -15,15 +18,17 @@ import '../models/versiculo.dart';
 
 class HomeScreen extends StatefulWidget {
   static String routeName = "/HomeScreen";
+
+  const HomeScreen({super.key});
   @override
-  State<HomeScreen> createState() => _stateHomeScreen();
+  State<HomeScreen> createState() => _StateHomeScreen();
 }
 
-class _stateHomeScreen extends State<HomeScreen> {
-  Future<List<DropdownMenuItem>>? listaBibles;
-  Future<List<DropdownMenuItem>>? listaLibros;
-  Future<List<DropdownMenuItem>>? listaCapitulos;
-  Future<List<DropdownMenuItem>>? listaVersiculos;
+class _StateHomeScreen extends State<HomeScreen> {
+  Future<List<DropdownMenuItem>>? listBibles;
+  Future<List<DropdownMenuItem>>? listLibros;
+  Future<List<DropdownMenuItem>>? listCapitulos;
+  Future<List<DropdownMenuItem>>? listVersiculos;
   bool canAddToFavorite = false;
   Object? selectedVersion = "592420522e16049f-01";
   Object? selectedBook = ""; //"GEN";
@@ -34,12 +39,11 @@ class _stateHomeScreen extends State<HomeScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    listaBibles = getAllBibles();
-    listaLibros = getAllBooks();
-    listaCapitulos = getAllChapters();
-    listaVersiculos = getAllVerses();
+    listBibles = getAllBibles();
+    listLibros = getAllBooks();
+    listCapitulos = getAllChapters();
+    listVersiculos = getAllVerses();
     // refreshText();
   }
 
@@ -54,12 +58,12 @@ class _stateHomeScreen extends State<HomeScreen> {
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height / 4,
               decoration: const BoxDecoration(
-                  gradient: const LinearGradient(
+                  gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  const Color.fromRGBO(0, 0, 255, 100),
-                  const Color.fromRGBO(5, 0, 255, 10)
+                  Color.fromRGBO(0, 0, 255, 100),
+                  Color.fromRGBO(5, 0, 255, 10)
                 ],
               )),
               child: Column(
@@ -70,7 +74,7 @@ class _stateHomeScreen extends State<HomeScreen> {
                     padding: const EdgeInsets.only(top: 50, left: 150),
                     child: Container(
                       padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                          const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
                       width: 230,
                       decoration: BoxDecoration(
                           color: Colors.white,
@@ -80,22 +84,24 @@ class _stateHomeScreen extends State<HomeScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
+                            const Text(
                               "Edicion",
                               style: TextStyle(color: Colors.blue),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 20,
                             ),
                             FutureBuilder<List<DropdownMenuItem>>(
-                              future: listaBibles,
+                              future: listBibles,
                               builder: (context, snapshot) {
                                 if (snapshot.hasError) {
-                                  return Text("Error");
+                                  return const Text("Error");
                                 }
                                 if (snapshot.connectionState ==
                                     ConnectionState.waiting) {
-                                  return CircularProgressIndicator();
+                                  return const CircularProgressIndicator(
+                                    color: Colors.red,
+                                  );
                                 }
                                 if (snapshot.hasData &&
                                     snapshot.connectionState ==
@@ -114,6 +120,7 @@ class _stateHomeScreen extends State<HomeScreen> {
                                       );
                                     }).toList(),
                                     onChanged: (newValue) async {
+                                      
                                       final _bibleProvider =
                                           Provider.of<BibleProvider>(context,
                                               listen: false);
@@ -127,9 +134,10 @@ class _stateHomeScreen extends State<HomeScreen> {
                                       // selectedBook="";
                                       // selectedChar = "";
                                       // selectedVerse="";
-                                      canAddToFavorite=false;
-                                      print("Bible selected >" +
-                                          newValue.toString());
+                                      canAddToFavorite = false;
+                                      if (kDebugMode) {
+                                        print("Bible selected >$newValue");
+                                      }
                                       selectedBook = "";
                                       if (response) {
                                         String currentVersion =
@@ -140,21 +148,17 @@ class _stateHomeScreen extends State<HomeScreen> {
                                         });
 
                                         setState(() {
-                                          listaLibros = getAllBooks();
+                                          listLibros = getAllBooks();
                                         });
                                       }
                                     },
                                   );
                                 }
 
-                                return Text("no info to show");
+                                return const Text("no info to show");
                               },
                             ),
-                            // Text(
-                            //   "Reina Valera",
-                            //   style: TextStyle(color: Colors.grey),
-                            // ),
-                            Icon(
+                            const Icon(
                               Icons.arrow_forward_ios_rounded,
                               size: 20,
                               color: Colors.grey,
@@ -172,7 +176,7 @@ class _stateHomeScreen extends State<HomeScreen> {
             child: Column(
               children: [
                 Row(
-                  children: [
+                  children: const [
                     Text(
                       "Bible",
                       style: TextStyle(color: Colors.white, fontSize: 45),
@@ -188,7 +192,7 @@ class _stateHomeScreen extends State<HomeScreen> {
           )),
           Padding(
             padding: const EdgeInsets.only(top: 150, left: 10),
-            child: SvgPicture.asset("assets/userHome.svg"),
+            child: SvgPicture.asset("assets/logo.svg"),
           ),
           Padding(
             padding: const EdgeInsets.only(top: 250, left: 200),
@@ -201,15 +205,15 @@ class _stateHomeScreen extends State<HomeScreen> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    SizedBox(
+                    const SizedBox(
                       width: 15,
                     ),
-                    Text(
+                    const Text(
                       "Libro |",
                       style: TextStyle(
                           color: Colors.white, fontWeight: FontWeight.normal),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 10,
                     ),
                     // Text(
@@ -217,22 +221,24 @@ class _stateHomeScreen extends State<HomeScreen> {
                     //   style: TextStyle(color: Colors.white),
                     // )
                     FutureBuilder<List<DropdownMenuItem>>(
-                      future: listaLibros,
+                      future: listLibros,
                       builder: (context, snapshot) {
                         if (snapshot.hasError) {
-                          return Text(
+                          return const Text(
                             "Selecciona una Biblia",
                             style: TextStyle(color: Colors.white),
                           );
                         }
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return CircularProgressIndicator();
+                          return const CircularProgressIndicator(
+                            color: Colors.white,
+                          );
                         }
                         if (snapshot.hasData &&
                             snapshot.connectionState == ConnectionState.done) {
                           return DropdownButton(
-                              style: TextStyle(color: Colors.grey),
+                              style: const TextStyle(color: Colors.grey),
                               // itemHeight: 50,
                               // Initial Value
                               value: selectedBook != ""
@@ -248,6 +254,7 @@ class _stateHomeScreen extends State<HomeScreen> {
                                 );
                               }).toList(),
                               onChanged: (newValue) async {
+                                
                                 final _bibleProvider =
                                     Provider.of<BibleProvider>(context,
                                         listen: false);
@@ -256,13 +263,13 @@ class _stateHomeScreen extends State<HomeScreen> {
                                   selectedBook = newValue;
                                   _bibleProvider.saveSelectedBook(
                                       selectedBook.toString());
-                                  listaCapitulos = getAllChapters();
+                                  listCapitulos = getAllChapters();
                                   canAddToFavorite = false;
                                 });
                               });
                         }
 
-                        return Text("no info to show");
+                        return const Text("no info to show");
                       },
                     ),
                   ],
@@ -271,18 +278,18 @@ class _stateHomeScreen extends State<HomeScreen> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(
+            padding: const EdgeInsets.only(
                 top: 300,
                 left: 10,
                 right: 10), //MediaQuery.of(context).size.width/3),
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               height: 50,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
+                  boxShadow: const [
                     // BoxShadow(
                     //   color: Colors.grey.withOpacity(0.5),
                     //   spreadRadius: 5,
@@ -295,30 +302,32 @@ class _stateHomeScreen extends State<HomeScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       "Capitulo",
                       style: TextStyle(
                           color: Colors.blue,
                           fontWeight: FontWeight.normal,
                           fontSize: 20),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 8,
                     ),
                     FutureBuilder<List<DropdownMenuItem>>(
-                      future: listaCapitulos,
+                      future: listCapitulos,
                       builder: (context, snapshot) {
                         if (snapshot.hasError) {
-                          return Text("Error");
+                          return const Text("Error");
                         }
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return CircularProgressIndicator();
+                          return const CircularProgressIndicator(
+                            color: Colors.red,
+                          );
                         }
                         if (snapshot.hasData &&
                             snapshot.connectionState == ConnectionState.done) {
                           return DropdownButton(
-                              style: TextStyle(color: Colors.grey),
+                              style: const TextStyle(color: Colors.grey),
                               // itemHeight: 50,
                               // Initial Value
                               value: selectedChar != ""
@@ -334,6 +343,7 @@ class _stateHomeScreen extends State<HomeScreen> {
                                 );
                               }).toList(),
                               onChanged: (newValue) async {
+                                
                                 final _bibleProvider =
                                     Provider.of<BibleProvider>(context,
                                         listen: false);
@@ -343,44 +353,46 @@ class _stateHomeScreen extends State<HomeScreen> {
                                   _bibleProvider.saveSelectedChapter(
                                       selectedChar.toString());
                                   // selectedVerse = "";
-                                  listaVersiculos = getAllVerses();
+                                  listVersiculos = getAllVerses();
                                   canAddToFavorite = false;
                                 });
                               });
                         }
 
-                        return Text("no info to show");
+                        return const Text("no info to show");
                       },
                     ),
-                    Icon(
+                    const Icon(
                       Icons.arrow_forward_ios_rounded,
                       color: Colors.grey,
                       size: 15,
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 50,
                     ),
-                    Text(
+                    const Text(
                       "Versiculo",
                       style: TextStyle(color: Colors.blue, fontSize: 20),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 8,
                     ),
                     FutureBuilder<List<DropdownMenuItem>>(
-                      future: listaVersiculos,
+                      future: listVersiculos,
                       builder: (context, snapshot) {
                         if (snapshot.hasError) {
-                          return Text("Error");
+                          return const Text("Error");
                         }
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return CircularProgressIndicator();
+                          return const CircularProgressIndicator(
+                            color: Colors.red,
+                          );
                         }
                         if (snapshot.hasData &&
                             snapshot.connectionState == ConnectionState.done) {
                           return DropdownButton(
-                              style: TextStyle(color: Colors.grey),
+                              style: const TextStyle(color: Colors.grey),
                               // itemHeight: 50,
                               // Initial Value
                               value: selectedVerse != ""
@@ -405,15 +417,15 @@ class _stateHomeScreen extends State<HomeScreen> {
                                   _bibleProvider.saveSelectedVerse(
                                       selectedVerse.toString());
                                   refreshText();
-                                  canAddToFavorite=true;
+                                  canAddToFavorite = true;
                                 });
                               });
                         }
 
-                        return Text("no info to show");
+                        return const Text("no info to show");
                       },
                     ),
-                    Icon(
+                    const Icon(
                       Icons.arrow_forward_ios_rounded,
                       color: Colors.grey,
                       size: 15,
@@ -424,14 +436,14 @@ class _stateHomeScreen extends State<HomeScreen> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(
+            padding: const EdgeInsets.only(
                 top: 370,
                 left: 20,
                 right: 20), //MediaQuery.of(context).size.width/3),
             child: Column(
               children: [
                 Container(
-                    padding: EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(8),
                     height: MediaQuery.of(context).size.height / 3,
                     width: MediaQuery.of(context).size.width,
                     decoration: BoxDecoration(
@@ -443,16 +455,16 @@ class _stateHomeScreen extends State<HomeScreen> {
                             color: Colors.grey.withOpacity(0.5),
                             spreadRadius: 5,
                             blurRadius: 7,
-                            offset: Offset(0, 3), // changes position of shadow
+                            offset: const Offset(0, 3), // changes position of shadow
                           ),
                         ]),
                     child: SingleChildScrollView(
-                        child: 
-                        Text(
+                        child: Text(
                       _currentText,
-                      style: TextStyle(fontSize: 25),)
-                      // Html(),
-                      )),
+                      style: const TextStyle(fontSize: 25),
+                    )
+                        // Html(),
+                        )),
                 Padding(
                   padding: const EdgeInsets.only(top: 20),
                   child: Row(
@@ -463,14 +475,16 @@ class _stateHomeScreen extends State<HomeScreen> {
                           final _bibleProvider = Provider.of<BibleProvider>(
                               context,
                               listen: false);
-                          String verse =
-                              await _bibleProvider.getSelectedVerse();
-                          List<DropdownMenuItem>? dd = await listaVersiculos;
-                          print("SELECTED VERSE> " + selectedVerse.toString());
+                          List<DropdownMenuItem>? dd = await listVersiculos;
+                          if (kDebugMode) {
+                            print("SELECTED VERSE> $selectedVerse");
+                          }
                           int counter = 0;
                           int finalIndex = 0;
                           for (DropdownMenuItem x in dd!) {
-                            print(x.value);
+                            if (kDebugMode) {
+                              print(x.value);
+                            }
 
                             if (x.value == selectedVerse.toString()) {
                               finalIndex = counter;
@@ -479,8 +493,12 @@ class _stateHomeScreen extends State<HomeScreen> {
                           }
                           finalIndex = finalIndex - 1;
                           if (finalIndex > 0) {
-                            print("CHANGING TO VERSE" + dd[finalIndex].value);
+                            if (kDebugMode) {
+                              // ignore: prefer_interpolation_to_compose_strings
+                              print("CHANGING TO VERSE" + dd[finalIndex].value);
+                            }
                             selectedVerse = dd[finalIndex].value;
+                            canAddToFavorite = true;
                             _bibleProvider
                                 .saveSelectedVerse(selectedVerse.toString());
                             refreshText();
@@ -488,7 +506,7 @@ class _stateHomeScreen extends State<HomeScreen> {
                             //TODO go previous chap
                           }
                         },
-                        child: Icon(
+                        child: const Icon(
                           Icons.arrow_back_ios_new_rounded,
                           size: 50,
                           color: Colors.blue,
@@ -497,16 +515,47 @@ class _stateHomeScreen extends State<HomeScreen> {
                       GestureDetector(
                         onTap: () async {
                           if (canAddToFavorite) {
-                            final provider = Provider.of<BibleProvider>(context,listen: false);
-                            final auth_provider = Provider.of<AuthProvider>(context,listen: false);
+                            final provider = Provider.of<BibleProvider>(context,
+                                listen: false);
+                            final auth_provider = Provider.of<AuthProvider>(
+                                context,
+                                listen: false);
                             User usr = await auth_provider.getCurrentUser();
                             Favorite fav = Favorite();
-                            fav.bibleId = await provider.getSelectedVersionLocally();
-                            fav.bibleName = await provider.getSelectedVersionLocally();
+                            fav.bibleId =
+                                await provider.getSelectedVersionLocally();
+                            fav.bibleName =
+                                await provider.getSelectedVersionLocally();
                             fav.text = _currentText;
                             fav.userId = usr.uid;
-                            fav.title=await provider.getSelectedVerse();
-                            var x =  provider.addFavorite(fav);
+                            fav.title = await provider.getSelectedVerse();
+                            bool added = await provider.addFavorite(fav);
+                            if (added) {
+                              CoolAlert.show(
+                                  context: context,
+                                  backgroundColor: Colors.white,
+                                  type: CoolAlertType.success,
+                                  title: "Agregado",
+                                  text: "Se ha agregado ${fav.title!} a favoritos");
+                              canAddToFavorite = false;
+                              setState(() {});
+                            } else {
+                              CoolAlert.show(
+                                  context: context,
+                                  backgroundColor: Colors.white,
+                                  type: CoolAlertType.error,
+                                  title: "Error",
+                                  text: "No pudimos agregar a${fav.title!} a favoritos");
+                              canAddToFavorite = true;
+                            }
+                          } else {
+                            CoolAlert.show(
+                                backgroundColor: Colors.white,
+                                context: context,
+                                type: CoolAlertType.warning,
+                                title: "Verso invalido",
+                                text:
+                                    "Este verso ya esta entre tus favoritos o es invalido, favor seleccionar otro");
                           }
                         },
                         child: Padding(
@@ -516,7 +565,7 @@ class _stateHomeScreen extends State<HomeScreen> {
                           child: Icon(
                             Icons.star_border,
                             size: 45,
-                            color: canAddToFavorite?Colors.blue:Colors.grey,
+                            color: canAddToFavorite ? Colors.blue : Colors.grey,
                           ),
                         ),
                       ),
@@ -527,8 +576,8 @@ class _stateHomeScreen extends State<HomeScreen> {
                               listen: false);
                           String verse =
                               await _bibleProvider.getSelectedVerse();
-                          List<DropdownMenuItem>? dd = await listaVersiculos;
-                          print("SELECTED VERSE> " + selectedVerse.toString());
+                          List<DropdownMenuItem>? dd = await listVersiculos;
+                          print("SELECTED VERSE> $selectedVerse");
                           int counter = 0;
                           int finalIndex = 0;
                           for (DropdownMenuItem x in dd!) {
@@ -543,12 +592,13 @@ class _stateHomeScreen extends State<HomeScreen> {
                             selectedVerse = dd[finalIndex].value;
                             _bibleProvider
                                 .saveSelectedVerse(selectedVerse.toString());
+                            canAddToFavorite = true;
                             refreshText();
                           } else {
 //TODO go next chapter
                           }
                         },
-                        child: Icon(
+                        child: const Icon(
                           Icons.arrow_forward_ios_rounded,
                           size: 50,
                           color: Colors.blue,
@@ -582,7 +632,7 @@ class _stateHomeScreen extends State<HomeScreen> {
     final _bibleProvider = Provider.of<BibleProvider>(context, listen: false);
     List<DropdownMenuItem> finalList = [];
     String currentId = await _bibleProvider.getSelectedVersionLocally();
-    List<Book> x = await _bibleProvider.getBibleBooksByid(currentId);
+    List<Book> x = await _bibleProvider.getBibleBooksById(currentId);
     for (Book y in x) {
       finalList.add(DropdownMenuItem(
         value: y.id,
@@ -607,7 +657,7 @@ class _stateHomeScreen extends State<HomeScreen> {
         ));
       }
     } else {
-      finalList.add(DropdownMenuItem(
+      finalList.add(const DropdownMenuItem(
         value: 0,
         child: Text("No Capitulos"),
       ));
@@ -618,7 +668,7 @@ class _stateHomeScreen extends State<HomeScreen> {
   Future<List<DropdownMenuItem>>? getAllVerses() async {
     final _bibleProvider = Provider.of<BibleProvider>(context, listen: false);
     List<DropdownMenuItem> finalList = [
-      DropdownMenuItem(child: Text("Selecciona un Versiculo"))
+      const DropdownMenuItem(child: Text("Selecciona un Versiculo"))
     ];
     String currentBibleId = await _bibleProvider.getSelectedVersionLocally();
     String currentBookId = await _bibleProvider.getSelectedBook();
@@ -633,7 +683,7 @@ class _stateHomeScreen extends State<HomeScreen> {
         ));
       }
     } else {
-      finalList.add(DropdownMenuItem(
+      finalList.add(const DropdownMenuItem(
         value: 0,
         child: Text("No Versiculos"),
       ));

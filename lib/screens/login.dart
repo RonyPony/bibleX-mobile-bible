@@ -7,6 +7,7 @@ import 'package:bibleando3/widgets/linkBtn.dart';
 import 'package:bibleando3/widgets/mainBtn.dart';
 import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -16,20 +17,21 @@ import '../widgets/textBox.dart';
 
 class LoginScreen extends StatefulWidget {
   static String routeName = "/loginScreen";
+
+  const LoginScreen({super.key});
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
 
-  TextEditingController emailController = TextEditingController(text: "ronel.cruz.a8@gmail.com");
-  TextEditingController passwordController = TextEditingController(text: "ronel0808");
+  TextEditingController emailController = TextEditingController(text: kDebugMode?"ronel.cruz.a8@gmail.com":"");
+  TextEditingController passwordController = TextEditingController(text: kDebugMode?"ronel0808":"");
   
   bool rememberme = false;
 
 @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -56,17 +58,19 @@ class _LoginScreenState extends State<LoginScreen> {
             scrollDirection: Axis.vertical,
             child: Stack(
               children: [
-                Image.asset("assets/login-background.png"),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildSkiptBtn(),
-                    _buildLabel(),
-                    _buildForm(),
-                    _buildMainBtn(),
-                    
-                    _buildRegisterBtn(),
-                  ],
+                Image.asset("assets/login-background.png",scale: 1.05,),
+                SafeArea(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      
+                      _buildLabel(),
+                      _buildForm(),
+                      _buildMainBtn(),
+                      _buildSkiptBtn(),
+                      _buildRegisterBtn(),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -143,30 +147,33 @@ class _LoginScreenState extends State<LoginScreen> {
   }
   Widget _buildSkiptBtn() {
     return SafeArea(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          GestureDetector(
-            child: Row(
-              children: [
-                
-                Text("Saltar",style: TextStyle(color: Colors.white,fontSize: 20),),
-                Icon(Icons.arrow_forward_ios_rounded,color: Colors.white,)
-              ],
+      child: Padding(
+        padding: const EdgeInsets.only(top: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            GestureDetector(
+              child: Row(
+                children: [
+                  
+                  Text("Saltar",style: TextStyle(color: Colors.white,fontSize: 20),),
+                  Icon(Icons.arrow_forward_ios_rounded,color: Colors.white,)
+                ],
+              ),
+              onTap: () {
+                Navigator.pushNamedAndRemoveUntil(
+                    context, HomeScreen.routeName, (route) => false);
+              },
             ),
-            onTap: () {
-              Navigator.pushNamedAndRemoveUntil(
-                  context, HomeScreen.routeName, (route) => false);
-            },
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildRegisterBtn() {
     return Padding(
-      padding: const EdgeInsets.only(top: 50),
+      padding: const EdgeInsets.only(top: 40),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

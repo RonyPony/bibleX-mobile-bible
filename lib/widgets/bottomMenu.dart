@@ -65,54 +65,52 @@ class _BottomMenuState extends State<BottomMenu> {
     
       return Align(
         alignment: Alignment.bottomCenter,
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 0, top: 0, left: 0, right: 0),
-          child: Container(
-            padding: EdgeInsets.only(bottom: 0),
-            decoration: BoxDecoration(
-                color: Colors.blue,
-                gradient: LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [
-                    const Color.fromRGBO(0, 0, 255, 100),
-                    const Color.fromRGBO(5, 0, 255, 10)
-                  ],
+        child: Container(
+          padding: EdgeInsets.only(bottom: 0),
+          decoration: BoxDecoration(
+              color: Colors.blue,
+              
+              gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  const Color.fromRGBO(0, 0, 255, 100),
+                  const Color.fromRGBO(5, 0, 255, 10)
+                ],
+              ),
+              borderRadius: BorderRadius.circular(40)),
+          child: BottomNavigationBar(
+            elevation: 0,
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            backgroundColor: Colors.transparent,
+            items: const <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.home,
+                  size: 35,
                 ),
-                borderRadius: BorderRadius.circular(40)),
-            child: BottomNavigationBar(
-              elevation: 0,
-              showSelectedLabels: false,
-              showUnselectedLabels: false,
-              backgroundColor: Colors.transparent,
-              items: const <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.home,
-                    size: 35,
-                  ),
-                  label: 'Home',
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.list,
+                  size: 35,
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.list,
-                    size: 35,
-                  ),
-                  label: 'Favorite',
+                label: 'Favorite',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.settings,
+                  size: 35,
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.settings,
-                    size: 35,
-                  ),
-                  label: 'Settings',
-                ),
-              ],
-              currentIndex: _selectedIndex,
-              unselectedItemColor: Color(0xffcccccc),
-              selectedItemColor: Colors.white,
-              onTap: _onItemTapped,
-            ),
+                label: 'Settings',
+              ),
+            ],
+            currentIndex: _selectedIndex,
+            unselectedItemColor: Color(0xffcccccc),
+            selectedItemColor: Colors.white,
+            onTap: _onItemTapped,
           ),
         ),
       );

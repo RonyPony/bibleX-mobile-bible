@@ -64,7 +64,7 @@ class BibleService implements BibleContract {
   }
 
   @override
-  Future<List<Book>> getBibleBooksByid(String bibleId) async {
+  Future<List<Book>> getBibleBooksById(String bibleId) async {
     //https://api.scripture.api.bible/v1/bibles/592420522e16049f-01/books
 
     Response? response;
@@ -104,7 +104,7 @@ class BibleService implements BibleContract {
   }
 
   @override
-  Future<String> getBibleByid(String id) {
+  Future<String> getBibleById(String id) {
     // TODO: implement getBibleByid
     throw UnimplementedError();
   }
@@ -122,7 +122,7 @@ class BibleService implements BibleContract {
   }
 
   @override
-  Future<String> getDestinityVerse() {
+  Future<String> getDestinyVerse() {
     // TODO: implement getDestinityVerse
     throw UnimplementedError();
   }
@@ -180,7 +180,7 @@ class BibleService implements BibleContract {
   }
 
   @override
-  Future<String> getSelectedDestinityChar() {
+  Future<String> getSelectedDestinyChar() {
     // TODO: implement getSelectedDestinityChar
     throw UnimplementedError();
   }
@@ -246,7 +246,7 @@ class BibleService implements BibleContract {
   }
 
   @override
-  Future<List<Capitulo>> getcharcters(String bibleId, String bookId) async {
+  Future<List<Capitulo>> getCharacters(String bibleId, String bookId) async {
     // https: //api.scripture.api.bible/v1/bibles/592420522e16049f-01/books/GEN/chapters
     Response? response;
     List<Capitulo>? dataResponse;
@@ -415,30 +415,26 @@ class BibleService implements BibleContract {
   }
 
   @override
-  Future<bool> removeFavorite(String bibleId, String reference) async {
-   FirebaseFirestore.instance
-  .collection('users')
-  .doc("userId")
-  .collection('favourites')
-  .where('prod_id', isEqualTo: '')
-  .get()
-  .then((snapshot) {
-    // ... 
-  });
-//     var jobskill_query = FirebaseFirestore.instance.collection('job_skills').where('',isEqualTo: '');//'job_id','==',post.job_id);
-// jobskill_query.get().then(function(querySnapshot) {
-//   querySnapshot.forEach(function(doc) {
-//     doc.ref.delete();
-//   });
-// });
+  Future<bool> removeFavorite(
+      String bibleId, String reference, String userId) async {
+    try {
+      FirebaseFirestore.instance
+          .collection(FirestoreConstants.pathFavoritesVersesCollection)
+          .where('userId', isEqualTo: userId)
+          .where('reference', isEqualTo: reference)
+          .get()
+          .then((snapshot) {
+        snapshot.docs.forEach((element) {
+          print(element.id);
+          element.reference.delete();
+        });
+      });
 
-    // Future<void> deleteUser() {
-    //   return users
-    //       .doc('T4VVZII33847PyQvrwSI')
-    //       .delete()
-    //       .then((value) => print("User Deleted"))
-    //       .catchError((error) => print("Failed to delete user: $error"));
-    // }
-    return true;
+      return true;
+    } catch (e) {
+      print("Error >"+e.toString());
+      return false;
+    }
   }
+  
 }

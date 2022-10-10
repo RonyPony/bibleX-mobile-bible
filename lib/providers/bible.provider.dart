@@ -4,17 +4,15 @@ import 'package:bibleando3/contracts/bible.contract.dart';
 import 'package:bibleando3/models/bible.dart';
 import 'package:bibleando3/models/favorite.dart';
 import 'package:bibleando3/models/versiculo.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../models/book.dart';
 import '../models/capitulos.dart';
 
 class BibleProvider with ChangeNotifier {
-  BibleContract _contract;
-  AuthContract _authContract;
+  final BibleContract _contract;
+  final AuthContract _authContract;
   BibleProvider(this._contract,this._authContract);
 
   Future<List<Bible>> getAllBibles() async {
@@ -28,8 +26,8 @@ class BibleProvider with ChangeNotifier {
     return result;
   } 
 
-  Future<bool> removeFavorite(String bibleId, String reference) async {
-    var result = await _contract.removeFavorite(bibleId,reference);
+  Future<bool> removeFavorite(String bibleId, String reference,String userId) async {
+    var result = await _contract.removeFavorite(bibleId,reference,userId);
     return result;
   }
 
@@ -43,13 +41,13 @@ class BibleProvider with ChangeNotifier {
     return result;
   }
 
-  Future<List<Book>> getBibleBooksByid(String id) async {
-    final result = await _contract.getBibleBooksByid(id);
+  Future<List<Book>> getBibleBooksById(String id) async {
+    final result = await _contract.getBibleBooksById(id);
     return result;
   }
 
-  Future<String> getBibleByid(String id) async {
-    final result = await _contract.getBibleByid(id);
+  Future<String> getBibleById(String id) async {
+    final result = await _contract.getBibleById(id);
     return result;
   }
 
@@ -63,8 +61,8 @@ class BibleProvider with ChangeNotifier {
     return result;
   }
 
-  Future<String> getDestinityVerse() async {
-    final result = await _contract.getDestinityVerse();
+  Future<String> getDestinyVerse() async {
+    final result = await _contract.getDestinyVerse();
     return result;
   }
 
@@ -84,12 +82,12 @@ class BibleProvider with ChangeNotifier {
     return result;
   }
 
-  Future<String> getSelectedDestinityChar() async {
-    final result = await _contract.getSelectedDestinityChar();
+  Future<String> getSelectedDestinyChar() async {
+    final result = await _contract.getSelectedDestinyChar();
     return result;
   }
 
-  Future<String> getSelectedDestinityVerse() async {
+  Future<String> getSelectedDestinyVerse() async {
     final result = await _contract.getSelectedOriginVerse();
     return result;
   }
@@ -110,7 +108,7 @@ class BibleProvider with ChangeNotifier {
   }
 
   Future<List<Capitulo>> getCharacters(String bibleId, String bookId) async {
-    final result = await _contract.getcharcters(bibleId, bookId);
+    final result = await _contract.getCharacters(bibleId, bookId);
     return result;
   }
 

@@ -9,15 +9,18 @@ class AuthService implements AuthContract {
   Future<bool> isUserAuthenticated() async {
     bool authenticated = false;
     try {
-      FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      var x = await FirebaseAuth.instance.authStateChanges().listen((User? user) {
         if (user == null) {
           authenticated = false;
+          
           print('User is currently signed out!');
+          
         } else {
           authenticated = true;
           print('User is signed in!');
         }
       });
+      // print(x);
       return authenticated;
     } catch (e) {
       print(e.toString());
