@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ronytuquizz.bibleando3">
    <application
-        android:label="bibleando3"
+        android:label="Biblia Multiversion"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity
