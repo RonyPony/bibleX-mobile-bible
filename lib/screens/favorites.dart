@@ -31,7 +31,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
 
   void asyncInitState() async {
     _favs = await getFavs();
-    
+
     setState(() {});
   }
 
@@ -124,7 +124,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
           ),
           _favs.length > 0
               ? Padding(
-                  padding: EdgeInsets.only(top: 250),
+                  padding: EdgeInsets.only(top: 270),
                   child: ListView.builder(
                     itemCount: _favs.length,
                     itemBuilder: (context, index) {
@@ -303,7 +303,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
         favStatus = "Aun no has agregado ningun verso a favoritos";
       }
       return x;
-    }else{
+    } else {
       favStatus = "Inicia sesion para ver tus favoritos";
       return x;
     }

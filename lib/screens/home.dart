@@ -73,8 +73,8 @@ class _StateHomeScreen extends State<HomeScreen> {
                       child: Padding(
                     padding: const EdgeInsets.only(top: 50, left: 150),
                     child: Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 0),
                       width: 230,
                       decoration: BoxDecoration(
                           color: Colors.white,
@@ -120,7 +120,6 @@ class _StateHomeScreen extends State<HomeScreen> {
                                       );
                                     }).toList(),
                                     onChanged: (newValue) async {
-                                      
                                       final _bibleProvider =
                                           Provider.of<BibleProvider>(context,
                                               listen: false);
@@ -254,7 +253,6 @@ class _StateHomeScreen extends State<HomeScreen> {
                                 );
                               }).toList(),
                               onChanged: (newValue) async {
-                                
                                 final _bibleProvider =
                                     Provider.of<BibleProvider>(context,
                                         listen: false);
@@ -278,8 +276,8 @@ class _StateHomeScreen extends State<HomeScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(
-                top: 300,
+            padding: EdgeInsets.only(
+                top: MediaQuery.of(context).size.height * .4,
                 left: 10,
                 right: 10), //MediaQuery.of(context).size.width/3),
             child: Container(
@@ -343,7 +341,6 @@ class _StateHomeScreen extends State<HomeScreen> {
                                 );
                               }).toList(),
                               onChanged: (newValue) async {
-                                
                                 final _bibleProvider =
                                     Provider.of<BibleProvider>(context,
                                         listen: false);
@@ -455,7 +452,8 @@ class _StateHomeScreen extends State<HomeScreen> {
                             color: Colors.grey.withOpacity(0.5),
                             spreadRadius: 5,
                             blurRadius: 7,
-                            offset: const Offset(0, 3), // changes position of shadow
+                            offset: const Offset(
+                                0, 3), // changes position of shadow
                           ),
                         ]),
                     child: SingleChildScrollView(
@@ -466,7 +464,7 @@ class _StateHomeScreen extends State<HomeScreen> {
                         // Html(),
                         )),
                 Padding(
-                  padding: const EdgeInsets.only(top: 20),
+                  padding: const EdgeInsets.only(top: 5),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -536,7 +534,8 @@ class _StateHomeScreen extends State<HomeScreen> {
                                   backgroundColor: Colors.white,
                                   type: CoolAlertType.success,
                                   title: "Agregado",
-                                  text: "Se ha agregado ${fav.title!} a favoritos");
+                                  text:
+                                      "Se ha agregado ${fav.title!} a favoritos");
                               canAddToFavorite = false;
                               setState(() {});
                             } else {
@@ -545,7 +544,8 @@ class _StateHomeScreen extends State<HomeScreen> {
                                   backgroundColor: Colors.white,
                                   type: CoolAlertType.error,
                                   title: "Error",
-                                  text: "No pudimos agregar a${fav.title!} a favoritos");
+                                  text:
+                                      "No pudimos agregar a${fav.title!} a favoritos");
                               canAddToFavorite = true;
                             }
                           } else {
