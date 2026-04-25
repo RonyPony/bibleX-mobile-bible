@@ -13,7 +13,8 @@ import '../models/capitulos.dart';
 class BibleProvider with ChangeNotifier {
   final BibleContract _contract;
   final AuthContract _authContract;
-  BibleProvider(this._contract,this._authContract);
+  final bool useLocalFavorites;
+  BibleProvider(this._contract, this._authContract, {this.useLocalFavorites = false});
 
   Future<List<Bible>> getAllBibles() async {
     final result = await _contract.getAllBibles();
@@ -21,18 +22,24 @@ class BibleProvider with ChangeNotifier {
   } 
 
   Future<List<Favorite>> getFavorites() async {
-    User x =await  _authContract.getCurrentUser();
-    var result = await _contract.getFavorites(x);
+    User x = await _authContract.getCurrentUser();
+    var result = useLocalFavorites
+        ? await _contract.getFavoritesLocal(x.uid)
+        : await _contract.getFavorites(x);
     return result;
   } 
 
   Future<bool> removeFavorite(String bibleId, String reference,String userId) async {
-    var result = await _contract.removeFavorite(bibleId,reference,userId);
+    var result = useLocalFavorites
+        ? await _contract.removeFavoriteLocal(reference, userId)
+        : await _contract.removeFavorite(bibleId, reference, userId);
     return result;
   }
 
   Future<bool> addFavorite(Favorite fav) async {
-    bool response = await _contract.addFavorite(fav);
+    bool response = useLocalFavorites
+        ? await _contract.addFavoriteLocal(fav)
+        : await _contract.addFavorite(fav);
     return response;
   }
 

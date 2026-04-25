@@ -1,6 +1,7 @@
 import 'package:bibleando3/providers/auth.provider.dart';
 import 'package:bibleando3/providers/bible.provider.dart';
-import 'package:cool_alert/cool_alert.dart';
+import 'package:bibleando3/screens/home.dart';
+import 'package:bibleando3/widgets/appAlert.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -131,14 +132,20 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                       return Padding(
                         padding: const EdgeInsets.only(
                             left: 10, right: 10, bottom: 10),
-                        child: Container(
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+                        child: GestureDetector(
+                          onTap: () async {
+                            if (!editMode) {
+                              await _openFavorite(_favs[index]);
+                            }
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
                               editMode
                                   ? Row(
                                       mainAxisAlignment: MainAxisAlignment.end,
@@ -167,44 +174,30 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                                                       reference!,
                                                       usr.uid);
                                               if (x) {
-                                                print("Favorito Eliminado");
-
-                                                setState(() async {
-                                                  await CoolAlert.show(
-                                                      context: context,
-                                                      type:
-                                                          CoolAlertType.success,
-                                                      backgroundColor:
-                                                          Colors.white,
-                                                      title: "Hecho",
-                                                      text:
-                                                          "Verso removido con exito");
-                                                  Navigator
-                                                      .pushNamedAndRemoveUntil(
-                                                          context,
-                                                          FavoriteScreen
-                                                              .routeName,
-                                                          (route) => false);
-                                                });
+                                                await showAppAlert(
+                                                  context,
+                                                  type: AppAlertType.success,
+                                                  title: "Removido",
+                                                  message:
+                                                      "Verso removido con éxito.",
+                                                );
+                                                Navigator.pushNamedAndRemoveUntil(
+                                                    context,
+                                                    FavoriteScreen.routeName,
+                                                    (route) => false);
                                               } else {
-                                                await CoolAlert.show(
-                                                    context: context,
-                                                    type: CoolAlertType.error,
-                                                    backgroundColor:
-                                                        Colors.white,
-                                                    title: "Error",
-                                                    text:
-                                                        "Error removiendo el verso, intentalo luego");
-                                                Navigator
-                                                    .pushNamedAndRemoveUntil(
-                                                        context,
-                                                        FavoriteScreen
-                                                            .routeName,
-                                                        (route) => false);
-                                                print(
-                                                    "Error Eliminando Favorito");
+                                                await showAppAlert(
+                                                  context,
+                                                  type: AppAlertType.error,
+                                                  title: "No se pudo remover",
+                                                  message:
+                                                      "Error removiendo el verso, inténtalo luego.",
+                                                );
+                                                Navigator.pushNamedAndRemoveUntil(
+                                                    context,
+                                                    FavoriteScreen.routeName,
+                                                    (route) => false);
                                               }
-                                              // TODO remove from favorite
                                             },
                                             child: Icon(
                                               Icons.close,
@@ -248,6 +241,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                                 ),
                               )
                             ],
+                            ),
                           ),
                         ),
                       );
@@ -307,5 +301,44 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
       favStatus = "Inicia sesion para ver tus favoritos";
       return x;
     }
+  }
+
+  Future<void> _openFavorite(Favorite favorite) async {
+    final provider = Provider.of<BibleProvider>(context, listen: false);
+    final reference = favorite.reference;
+    final bibleId = favorite.bibleId;
+    if (reference == null || bibleId == null) {
+      await showAppAlert(
+        context,
+        type: AppAlertType.warning,
+        title: "Favorito inválido",
+        message: "Este favorito no tiene información suficiente.",
+      );
+      return;
+    }
+
+    final parts = reference.split('.');
+    if (parts.length < 3) {
+      await showAppAlert(
+        context,
+        type: AppAlertType.warning,
+        title: "Referencia inválida",
+        message: "No pudimos interpretar la referencia del favorito.",
+      );
+      return;
+    }
+
+    final bookId = parts[0];
+    final chapterId = "${parts[0]}.${parts[1]}";
+    await provider.saveSelectedVersionLocally(bibleId);
+    await provider.saveSelectedBook(bookId);
+    await provider.saveSelectedChapter(chapterId);
+    await provider.saveSelectedVerse(reference);
+    if (!mounted) return;
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      HomeScreen.routeName,
+      (route) => false,
+    );
   }
 }
