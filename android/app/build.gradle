@@ -35,9 +35,9 @@ def keystoreProperties = new Properties()
    }
 
 android {
+    namespace "com.ronytuquizz.bibleando3"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -49,6 +49,10 @@ android {
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    buildFeatures {
+        buildConfig true
     }
 
     defaultConfig {

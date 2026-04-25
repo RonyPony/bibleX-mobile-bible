@@ -6,9 +6,9 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.1.2'
+        classpath 'com.android.tools.build:gradle:8.2.0'
         // START: FlutterFire Configuration
-        classpath 'com.google.gms:google-services:4.3.10'
+        classpath 'com.google.gms:google-services:4.4.2'
         // END: FlutterFire Configuration
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
@@ -23,11 +23,38 @@ allprojects {
 
 rootProject.buildDir = '../build'
 subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty("android")) {
+            project.android {
+                if (namespace == null || namespace == "") {
+                    def manifestFile = file("${project.projectDir}/src/main/AndroidManifest.xml")
+                    if (manifestFile.exists()) {
+                        def manifest = new XmlSlurper().parse(manifestFile)
+                        def pkg = manifest.@package.text()
+                        if (pkg != null && pkg != "") {
+                            namespace pkg
+                        } else {
+                            namespace project.group
+                        }
+                    } else {
+                        namespace project.group
+                    }
+                }
+
+                buildFeatures {
+                    buildConfig true
+                }
+            }
+        }
+    }
+}
+subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
 subprojects {
     project.evaluationDependsOn(':app')
 }
+
 
 task clean(type: Delete) {
     delete rootProject.buildDir

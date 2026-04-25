@@ -91,7 +91,7 @@ class _StateHomeScreen extends State<HomeScreen> {
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
+                            children: [
                               RichText(
                                 text: TextSpan(
                                   children: [
