@@ -13,8 +13,11 @@ abstract class BibleContract {
   Future<String>getPassage(String bibleId, String passageId);
   Future<String> getLongPassage();
   Future<List<Favorite>>getFavorites(User currentUser);
+  Future<List<Favorite>> getFavoritesLocal(String userId);
   Future<bool>removeFavorite(String bibleId,String reference,String userId);
+  Future<bool> removeFavoriteLocal(String reference, String userId);
   Future<bool> addFavorite(Favorite fav);
+  Future<bool> addFavoriteLocal(Favorite fav);
   Future<String> getSelectedBook();
   Future<bool> saveSelectedBook(String book);
   Future<String> getChar();
