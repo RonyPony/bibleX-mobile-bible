@@ -23,6 +23,7 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  static const bool useLocalFavorites = false;
 
 
   @override
@@ -58,7 +59,11 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => BibleProvider(BibleService(),AuthService()),
+          create: (context) => BibleProvider(
+            BibleService(),
+            AuthService(),
+            useLocalFavorites: useLocalFavorites,
+          ),
         ),
         ChangeNotifierProvider(
           create: (context) => AuthProvider(AuthService()),
@@ -67,7 +72,18 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Bibleando',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF4F46E5),
+            primary: const Color(0xFF4F46E5),
+            secondary: const Color(0xFFEF476F),
+            surface: const Color(0xFFF6F8FF),
+          ),
+          scaffoldBackgroundColor: const Color(0xFFF6F8FF),
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Color(0xFF4F46E5),
+            foregroundColor: Colors.white,
+          ),
         ),
         home: SplashScreen(),
         routes: routes,

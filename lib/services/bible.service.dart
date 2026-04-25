@@ -24,6 +24,7 @@ class BibleService implements BibleContract {
   String savedCurrentCharFlag = "CURRENTCHARFLAGX";
 
   String savedCurrentVerseFlag = "CURRENTVERSEFLAGX";
+  String localFavoritesFlag = "LOCAL_FAVORITES_FLAGX";
 
   @override
   Future<List<Bible>> getAllBibles() async {
@@ -379,6 +380,17 @@ class BibleService implements BibleContract {
   }
 
   @override
+  Future<List<Favorite>> getFavoritesLocal(String userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getStringList(localFavoritesFlag) ?? [];
+    final mapped = raw.map((x) {
+      final map = Uri.splitQueryString(x);
+      return Favorite.fromJson(Map<String, dynamic>.from(map));
+    }).toList();
+    return mapped.where((x) => x.userId == userId).toList();
+  }
+
+  @override
   Future<bool> addFavorite(Favorite fav) async {
     CollectionReference users = FirebaseFirestore.instance
         .collection(FirestoreConstants.pathFavoritesVersesCollection);
@@ -415,6 +427,42 @@ class BibleService implements BibleContract {
   }
 
   @override
+  Future<bool> addFavoriteLocal(Favorite fav) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final current = prefs.getStringList(localFavoritesFlag) ?? [];
+      final exists = current.any((entry) {
+        final map = Uri.splitQueryString(entry);
+        return map['reference'] == fav.title && map['userId'] == fav.userId;
+      });
+      if (exists) return false;
+
+      String currentBibleId = await getSelectedVersionLocally();
+      String currentChapterId = await getSelectedChar();
+      final verses = await getVerses(currentBibleId, currentChapterId);
+      final bibles = await getAllBibles();
+
+      final bibleName =
+          bibles.where((element) => element.id == fav.bibleName).first.name;
+      final ttl = verses.where((element) => element.id == fav.title).first.reference;
+      final normalized = Favorite(
+        bibleName: bibleName,
+        bibleId: fav.bibleId,
+        title: ttl,
+        reference: fav.title,
+        text: fav.text,
+        userId: fav.userId,
+      );
+
+      current.add(Uri(queryParameters: normalized.toJson()).query);
+      return prefs.setStringList(localFavoritesFlag, current);
+    } catch (e) {
+      print("Failed to add local favorite: $e");
+      return false;
+    }
+  }
+
+  @override
   Future<bool> removeFavorite(
       String bibleId, String reference, String userId) async {
     try {
@@ -433,6 +481,22 @@ class BibleService implements BibleContract {
       return true;
     } catch (e) {
       print("Error >"+e.toString());
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> removeFavoriteLocal(String reference, String userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final current = prefs.getStringList(localFavoritesFlag) ?? [];
+      current.removeWhere((entry) {
+        final map = Uri.splitQueryString(entry);
+        return map['reference'] == reference && map['userId'] == userId;
+      });
+      return prefs.setStringList(localFavoritesFlag, current);
+    } catch (e) {
+      print("Error local remove >$e");
       return false;
     }
   }
