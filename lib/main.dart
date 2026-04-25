@@ -23,6 +23,7 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  static const bool useLocalFavorites = false;
 
 
   @override
@@ -58,7 +59,11 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => BibleProvider(BibleService(),AuthService()),
+          create: (context) => BibleProvider(
+            BibleService(),
+            AuthService(),
+            useLocalFavorites: useLocalFavorites,
+          ),
         ),
         ChangeNotifierProvider(
           create: (context) => AuthProvider(AuthService()),

@@ -10,12 +10,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/bible.dart';
 import '../models/book.dart';
 import '../models/capitulos.dart';
 import '../models/favorite.dart';
 import '../models/versiculo.dart';
+import 'reader_focus.dart';
 
 class HomeScreen extends StatefulWidget {
   static String routeName = "/HomeScreen";
@@ -37,6 +39,11 @@ class _StateHomeScreen extends State<HomeScreen> {
   Object? selectedVerse = ""; //"GEN.1.1";
   bool _savingFavorite = false;
   bool _savedCurrentVerse = false;
+  Color _readerTextColor = const Color(0xFF1C2541);
+  double _readerFontSize = 25;
+
+  static const String _readerTextColorKey = "reader_text_color";
+  static const String _readerFontSizeKey = "reader_font_size";
 
   String _currentText = "Selecciona arriba los parametros de busqueda.";
 
@@ -47,6 +54,7 @@ class _StateHomeScreen extends State<HomeScreen> {
     listLibros = getAllBooks();
     listCapitulos = getAllChapters();
     listVersiculos = getAllVerses();
+    _loadReaderPreferences();
     // refreshText();
   }
 
@@ -424,50 +432,33 @@ class _StateHomeScreen extends State<HomeScreen> {
                     child: SingleChildScrollView(
                         child: Text(
                       _currentText,
-                      style: const TextStyle(fontSize: 25),
+                      style: TextStyle(
+                        fontSize: _readerFontSize,
+                        color: _readerTextColor,
+                        height: 1.45,
+                      ),
                     )
                         // Html(),
                         )),
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton.icon(
+                  onPressed: _currentText.trim().isEmpty ||
+                          _currentText == "Selecciona arriba los parametros de busqueda."
+                      ? null
+                      : _openReaderFocus,
+                  icon: const Icon(Icons.open_in_full_rounded),
+                  label: const Text("Expandir lectura"),
+                ),
+              ),
               const SizedBox(height: 8),
               Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       GestureDetector(
                         onTap: () async {
-                          final _bibleProvider = Provider.of<BibleProvider>(
-                              context,
-                              listen: false);
-                          List<DropdownMenuItem>? dd = await listVersiculos;
-                          if (kDebugMode) {
-                            print("SELECTED VERSE> $selectedVerse");
-                          }
-                          int counter = 0;
-                          int finalIndex = 0;
-                          for (DropdownMenuItem x in dd!) {
-                            if (kDebugMode) {
-                              print(x.value);
-                            }
-
-                            if (x.value == selectedVerse.toString()) {
-                              finalIndex = counter;
-                            }
-                            counter++;
-                          }
-                          finalIndex = finalIndex - 1;
-                          if (finalIndex > 0) {
-                            if (kDebugMode) {
-                              // ignore: prefer_interpolation_to_compose_strings
-                              print("CHANGING TO VERSE" + dd[finalIndex].value);
-                            }
-                            selectedVerse = dd[finalIndex].value;
-                            canAddToFavorite = true;
-                            _savedCurrentVerse = false;
-                            _bibleProvider
-                                .saveSelectedVerse(selectedVerse.toString());
-                            refreshText();
-                          } else {
-                            //TODO go previous chap
-                          }
+                          await _goToPreviousVerse();
                         },
                         child: const Icon(
                           Icons.arrow_back_ios_new_rounded,
@@ -575,33 +566,7 @@ class _StateHomeScreen extends State<HomeScreen> {
                       ),
                       GestureDetector(
                         onTap: () async {
-                          final _bibleProvider = Provider.of<BibleProvider>(
-                              context,
-                              listen: false);
-                          String verse =
-                              await _bibleProvider.getSelectedVerse();
-                          List<DropdownMenuItem>? dd = await listVersiculos;
-                          print("SELECTED VERSE> $selectedVerse");
-                          int counter = 0;
-                          int finalIndex = 0;
-                          for (DropdownMenuItem x in dd!) {
-                            print(x.value);
-                            counter++;
-                            if (x.value == selectedVerse.toString()) {
-                              finalIndex = counter;
-                            }
-                          }
-                          if (dd.length > finalIndex) {
-                            print("CHANGING TO VERSE" + dd[finalIndex].value);
-                            selectedVerse = dd[finalIndex].value;
-                            _bibleProvider
-                                .saveSelectedVerse(selectedVerse.toString());
-                            canAddToFavorite = true;
-                            _savedCurrentVerse = false;
-                            refreshText();
-                          } else {
-//TODO go next chapter
-                          }
+                          await _goToNextVerse();
                         },
                         child: const Icon(
                           Icons.arrow_forward_ios_rounded,
@@ -704,6 +669,81 @@ class _StateHomeScreen extends State<HomeScreen> {
     String htmText = await _bibleProvider.getPassage(bibleId, verse);
     setState(() {
       _currentText = htmText;
+    });
+  }
+
+  Future<void> _openReaderFocus() async {
+    final action = await Navigator.push<ReaderAction>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ReaderFocusScreen(
+          text: _currentText,
+          textColor: _readerTextColor,
+          fontSize: _readerFontSize,
+        ),
+      ),
+    );
+    if (action == ReaderAction.previous) {
+      await _goToPreviousVerse();
+    }
+    if (action == ReaderAction.next) {
+      await _goToNextVerse();
+    }
+  }
+
+  Future<void> _goToPreviousVerse() async {
+    final _bibleProvider = Provider.of<BibleProvider>(context, listen: false);
+    List<DropdownMenuItem>? dd = await listVersiculos;
+    if (kDebugMode) {
+      print("SELECTED VERSE> $selectedVerse");
+    }
+    int counter = 0;
+    int finalIndex = 0;
+    for (DropdownMenuItem x in dd!) {
+      if (x.value == selectedVerse.toString()) {
+        finalIndex = counter;
+      }
+      counter++;
+    }
+    finalIndex = finalIndex - 1;
+    if (finalIndex > 0) {
+      selectedVerse = dd[finalIndex].value;
+      canAddToFavorite = true;
+      _savedCurrentVerse = false;
+      await _bibleProvider.saveSelectedVerse(selectedVerse.toString());
+      refreshText();
+    }
+  }
+
+  Future<void> _goToNextVerse() async {
+    final _bibleProvider = Provider.of<BibleProvider>(context, listen: false);
+    List<DropdownMenuItem>? dd = await listVersiculos;
+    int counter = 0;
+    int finalIndex = 0;
+    for (DropdownMenuItem x in dd!) {
+      counter++;
+      if (x.value == selectedVerse.toString()) {
+        finalIndex = counter;
+      }
+    }
+    if (dd.length > finalIndex) {
+      selectedVerse = dd[finalIndex].value;
+      await _bibleProvider.saveSelectedVerse(selectedVerse.toString());
+      canAddToFavorite = true;
+      _savedCurrentVerse = false;
+      refreshText();
+    }
+  }
+
+  Future<void> _loadReaderPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    final colorValue = prefs.getInt(_readerTextColorKey);
+    final fontValue = prefs.getDouble(_readerFontSizeKey);
+    if (!mounted) return;
+    setState(() {
+      _readerTextColor =
+          colorValue != null ? Color(colorValue) : const Color(0xFF1C2541);
+      _readerFontSize = fontValue ?? 25;
     });
   }
 }
