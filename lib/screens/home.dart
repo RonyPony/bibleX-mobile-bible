@@ -49,257 +49,212 @@ class _StateHomeScreen extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isSmallScreen = size.height < 700;
+    final horizontalPadding = size.width * 0.05;
+
     return Scaffold(
-      persistentFooterButtons: [BottomMenu(currentIndex: 0)],
-      // appBar: AppBar(),
-      body: Stack(
-        children: [
-          Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height / 4,
-              decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color.fromRGBO(0, 0, 255, 100),
-                  Color.fromRGBO(5, 0, 255, 10)
-                ],
-              )),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SafeArea(
-                      child: Padding(
-                    padding: const EdgeInsets.only(top: 50, left: 150),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 0),
-                      width: 230,
+      backgroundColor: const Color(0xFFF6F8FF),
+      bottomNavigationBar: Padding(
+        padding: EdgeInsets.fromLTRB(horizontalPadding, 0, horizontalPadding, 8),
+        child: BottomMenu(currentIndex: 0),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(
+            horizontalPadding,
+            16,
+            horizontalPadding,
+            isSmallScreen ? 100 : 120,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(isSmallScreen ? 16 : 20),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF3B45E6), Color(0xFF6676FF)],
+                  ),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Row(
+                            children: const [
+                              Text(
+                                "Bible",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 34,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                "x",
+                                style: TextStyle(
+                                  color: Color(0xFFFF6B6B),
+                                  fontSize: 34,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.auto_stories_rounded, color: Colors.white),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    SvgPicture.asset(
+                      "assets/logo.svg",
+                      height: isSmallScreen ? 70 : 90,
+                    ),
+                    const SizedBox(height: 14),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
                       decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              "Edicion",
-                              style: TextStyle(color: Colors.blue),
-                            ),
-                            const SizedBox(
-                              width: 20,
-                            ),
-                            FutureBuilder<List<DropdownMenuItem>>(
+                        color: Colors.white.withOpacity(.92),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.menu_book_rounded, color: Color(0xFF3B45E6)),
+                          const SizedBox(width: 8),
+                          const Text(
+                            "Edición",
+                            style: TextStyle(color: Color(0xFF3B45E6)),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: FutureBuilder<List<DropdownMenuItem>>(
                               future: listBibles,
                               builder: (context, snapshot) {
-                                if (snapshot.hasError) {
-                                  return const Text("Error");
-                                }
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const CircularProgressIndicator(
-                                    color: Colors.red,
+                                if (snapshot.hasError) return const Text("Error");
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(strokeWidth: 2.5),
                                   );
                                 }
                                 if (snapshot.hasData &&
-                                    snapshot.connectionState ==
-                                        ConnectionState.done) {
+                                    snapshot.connectionState == ConnectionState.done) {
                                   return DropdownButton(
-                                    // itemHeight: 50,
-                                    // Initial Value
-                                    value:
-                                        selectedVersion, //snapshot.data![0].value,
-                                    // Down Arrow Icon
+                                    isExpanded: true,
+                                    underline: const SizedBox(),
+                                    value: selectedVersion,
                                     icon: const Icon(Icons.keyboard_arrow_down),
                                     items: snapshot.data!.map((e) {
-                                      return DropdownMenuItem(
-                                        value: e.value,
-                                        child: e.child,
-                                      );
+                                      return DropdownMenuItem(value: e.value, child: e.child);
                                     }).toList(),
                                     onChanged: (newValue) async {
-                                      final _bibleProvider =
-                                          Provider.of<BibleProvider>(context,
-                                              listen: false);
+                                      final _bibleProvider = Provider.of<BibleProvider>(context,
+                                          listen: false);
                                       bool response = await _bibleProvider
-                                          .saveSelectedVersionLocally(
-                                              newValue.toString());
-                                      // bool responseCap = await _bibleProvider
-                                      //     .saveSelectedChapter("");
-                                      //     bool responseVerse = await _bibleProvider
-                                      //     .saveSelectedVerse("");
-                                      // selectedBook="";
-                                      // selectedChar = "";
-                                      // selectedVerse="";
+                                          .saveSelectedVersionLocally(newValue.toString());
                                       canAddToFavorite = false;
-                                      if (kDebugMode) {
-                                        print("Bible selected >$newValue");
-                                      }
+                                      if (kDebugMode) print("Bible selected >$newValue");
                                       selectedBook = "";
                                       if (response) {
                                         String currentVersion =
-                                            await _bibleProvider
-                                                .getSelectedVersionLocally();
+                                            await _bibleProvider.getSelectedVersionLocally();
                                         setState(() {
                                           selectedVersion = currentVersion;
-                                        });
-
-                                        setState(() {
                                           listLibros = getAllBooks();
                                         });
                                       }
                                     },
                                   );
                                 }
-
-                                return const Text("no info to show");
+                                return const Text("Sin datos");
                               },
                             ),
-                            const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              size: 20,
-                              color: Colors.grey,
-                            )
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ))
-                ],
-              )),
-          SafeArea(
-              child: Padding(
-            padding: const EdgeInsets.only(left: 20),
-            child: Column(
-              children: [
-                Row(
-                  children: const [
-                    Text(
-                      "Bible",
-                      style: TextStyle(color: Colors.white, fontSize: 45),
-                    ),
-                    Text(
-                      "x",
-                      style: TextStyle(color: Colors.red, fontSize: 47),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          )),
-          Padding(
-            padding: const EdgeInsets.only(top: 150, left: 10),
-            child: SvgPicture.asset("assets/logo.svg"),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 250, left: 200),
-            child: Container(
-              height: 40,
-              width: 150,
-              decoration: BoxDecoration(
-                  color: Colors.red, borderRadius: BorderRadius.circular(10)),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    const SizedBox(
-                      width: 15,
-                    ),
-                    const Text(
-                      "Libro |",
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.normal),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    // Text(
-                    //   "Selecciona...",
-                    //   style: TextStyle(color: Colors.white),
-                    // )
-                    FutureBuilder<List<DropdownMenuItem>>(
-                      future: listLibros,
-                      builder: (context, snapshot) {
-                        if (snapshot.hasError) {
-                          return const Text(
-                            "Selecciona una Biblia",
-                            style: TextStyle(color: Colors.white),
-                          );
-                        }
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const CircularProgressIndicator(
-                            color: Colors.white,
-                          );
-                        }
-                        if (snapshot.hasData &&
-                            snapshot.connectionState == ConnectionState.done) {
-                          return DropdownButton(
-                              style: const TextStyle(color: Colors.grey),
-                              // itemHeight: 50,
-                              // Initial Value
-                              value: selectedBook != ""
-                                  ? selectedBook
-                                  : snapshot.data![0]
-                                      .value, //snapshot.data![0].value,
-                              // Down Arrow Icon
-                              icon: const Icon(Icons.keyboard_arrow_down),
-                              items: snapshot.data!.map((e) {
-                                return DropdownMenuItem(
-                                  value: e.value,
-                                  child: e.child,
-                                );
-                              }).toList(),
-                              onChanged: (newValue) async {
-                                final _bibleProvider =
-                                    Provider.of<BibleProvider>(context,
-                                        listen: false);
-                                selectedChar = "";
-                                setState(() {
-                                  selectedBook = newValue;
-                                  _bibleProvider.saveSelectedBook(
-                                      selectedBook.toString());
-                                  listCapitulos = getAllChapters();
-                                  canAddToFavorite = false;
-                                });
-                              });
-                        }
-
-                        return const Text("no info to show");
-                      },
                     ),
                   ],
                 ),
               ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(
-                top: MediaQuery.of(context).size.height * .4,
-                left: 10,
-                right: 10), //MediaQuery.of(context).size.width/3),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              height: 50,
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: const [
-                    // BoxShadow(
-                    //   color: Colors.grey.withOpacity(0.5),
-                    //   spreadRadius: 5,
-                    //   blurRadius: 7,
-                    //   offset: Offset(0, 3), // changes position of shadow
-                    // ),
-                  ]),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
+              const SizedBox(height: 14),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE84B66),
+                  borderRadius: BorderRadius.circular(14),
+                ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    const Icon(Icons.book_rounded, color: Colors.white),
+                    const SizedBox(width: 8),
+                    const Text("Libro", style: TextStyle(color: Colors.white)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: FutureBuilder<List<DropdownMenuItem>>(
+                        future: listLibros,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            return const Text("Selecciona una Biblia",
+                                style: TextStyle(color: Colors.white));
+                          }
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            );
+                          }
+                          if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
+                            return DropdownButton(
+                                isExpanded: true,
+                                underline: const SizedBox(),
+                                dropdownColor: Colors.white,
+                                style: const TextStyle(color: Colors.black87),
+                                value: selectedBook != "" ? selectedBook : snapshot.data![0].value,
+                                icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
+                                items: snapshot.data!.map((e) {
+                                  return DropdownMenuItem(value: e.value, child: e.child);
+                                }).toList(),
+                                onChanged: (newValue) async {
+                                  final _bibleProvider =
+                                      Provider.of<BibleProvider>(context, listen: false);
+                                  selectedChar = "";
+                                  setState(() {
+                                    selectedBook = newValue;
+                                    _bibleProvider.saveSelectedBook(selectedBook.toString());
+                                    listCapitulos = getAllChapters();
+                                    canAddToFavorite = false;
+                                  });
+                                });
+                          }
+                          return const Text("Sin datos", style: TextStyle(color: Colors.white));
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                constraints: const BoxConstraints(minHeight: 56),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFFD6DCFF))),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
                     const Text(
                       "Capitulo",
                       style: TextStyle(
@@ -430,30 +385,25 @@ class _StateHomeScreen extends State<HomeScreen> {
                   ],
                 ),
               ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-                top: 370,
-                left: 20,
-                right: 20), //MediaQuery.of(context).size.width/3),
-            child: Column(
-              children: [
-                Container(
+              ),
+              const SizedBox(height: 14),
+              Container(
                     padding: const EdgeInsets.all(8),
-                    height: MediaQuery.of(context).size.height / 3,
-                    width: MediaQuery.of(context).size.width,
+                    constraints: BoxConstraints(
+                      minHeight: isSmallScreen ? size.height * 0.24 : size.height * 0.3,
+                      maxHeight: size.height * 0.45,
+                    ),
+                    width: double.infinity,
                     decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.blue),
+                        border: Border.all(color: const Color(0xFF5E6BDF)),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 5,
-                            blurRadius: 7,
-                            offset: const Offset(
-                                0, 3), // changes position of shadow
+                            color: Colors.grey.withOpacity(0.2),
+                            spreadRadius: 1,
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
                           ),
                         ]),
                     child: SingleChildScrollView(
@@ -463,9 +413,8 @@ class _StateHomeScreen extends State<HomeScreen> {
                     )
                         // Html(),
                         )),
-                Padding(
-                  padding: const EdgeInsets.only(top: 5),
-                  child: Row(
+              const SizedBox(height: 8),
+              Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       GestureDetector(
@@ -506,8 +455,8 @@ class _StateHomeScreen extends State<HomeScreen> {
                         },
                         child: const Icon(
                           Icons.arrow_back_ios_new_rounded,
-                          size: 50,
-                          color: Colors.blue,
+                          size: 42,
+                          color: Color(0xFF4A57E9),
                         ),
                       ),
                       GestureDetector(
@@ -560,12 +509,13 @@ class _StateHomeScreen extends State<HomeScreen> {
                         },
                         child: Padding(
                           padding: EdgeInsets.symmetric(
-                              horizontal:
-                                  MediaQuery.of(context).size.width / 4),
+                              horizontal: size.width > 380 ? size.width / 5 : size.width / 8),
                           child: Icon(
-                            Icons.star_border,
-                            size: 45,
-                            color: canAddToFavorite ? Colors.blue : Colors.grey,
+                            canAddToFavorite ? Icons.star_rounded : Icons.star_outline_rounded,
+                            size: 44,
+                            color: canAddToFavorite
+                                ? const Color(0xFFFFA630)
+                                : Colors.grey.shade400,
                           ),
                         ),
                       ),
@@ -600,17 +550,16 @@ class _StateHomeScreen extends State<HomeScreen> {
                         },
                         child: const Icon(
                           Icons.arrow_forward_ios_rounded,
-                          size: 50,
-                          color: Colors.blue,
+                          size: 42,
+                          color: Color(0xFF4A57E9),
                         ),
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
+              const SizedBox(height: 8),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

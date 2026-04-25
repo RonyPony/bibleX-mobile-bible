@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:bibleando3/screens/settings.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 
 import '../screens/favorites.dart';
 import '../screens/home.dart';
@@ -62,57 +59,57 @@ class _BottomMenuState extends State<BottomMenu> {
 
   @override
   Widget build(BuildContext context) {
-    
-      return Align(
-        alignment: Alignment.bottomCenter,
-        child: Container(
-          padding: EdgeInsets.only(bottom: 0),
-          decoration: BoxDecoration(
-              color: Colors.blue,
-              
-              gradient: LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [
-                  const Color.fromRGBO(0, 0, 255, 100),
-                  const Color.fromRGBO(5, 0, 255, 10)
-                ],
-              ),
-              borderRadius: BorderRadius.circular(40)),
-          child: BottomNavigationBar(
-            elevation: 0,
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
-            backgroundColor: Colors.transparent,
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.home,
-                  size: 35,
-                ),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.list,
-                  size: 35,
-                ),
-                label: 'Favorite',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.settings,
-                  size: 35,
-                ),
-                label: 'Settings',
-              ),
-            ],
-            currentIndex: _selectedIndex,
-            unselectedItemColor: Color(0xffcccccc),
-            selectedItemColor: Colors.white,
-            onTap: _onItemTapped,
+    final width = MediaQuery.of(context).size.width;
+    final iconSize = width < 360 ? 24.0 : 28.0;
+
+    return Container(
+      decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [Color(0xFF3D46E7), Color(0xFF6676FF)],
           ),
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x334A57E9),
+              offset: Offset(0, 8),
+              blurRadius: 16,
+            )
+          ]),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: BottomNavigationBar(
+          elevation: 0,
+          type: BottomNavigationBarType.fixed,
+          showSelectedLabels: true,
+          showUnselectedLabels: true,
+          selectedFontSize: 12,
+          unselectedFontSize: 11,
+          backgroundColor: Colors.transparent,
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined, size: iconSize),
+              activeIcon: Icon(Icons.home_rounded, size: iconSize),
+              label: 'Inicio',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.favorite_outline_rounded, size: iconSize),
+              activeIcon: Icon(Icons.favorite_rounded, size: iconSize),
+              label: 'Favoritos',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.tune_rounded, size: iconSize),
+              activeIcon: Icon(Icons.settings_suggest_rounded, size: iconSize),
+              label: 'Ajustes',
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          unselectedItemColor: const Color(0xFFDCE1FF),
+          selectedItemColor: Colors.white,
+          onTap: _onItemTapped,
         ),
-      );
+      ),
+    );
   }
 }
