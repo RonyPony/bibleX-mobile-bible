@@ -67,7 +67,7 @@ class _BottomMenuState extends State<BottomMenu> {
           gradient: const LinearGradient(
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
-            colors: [Color(0xFF3D46E7), Color(0xFF6676FF)],
+            colors: [Color(0xFF4F46E5), Color(0xFF7C84FF)],
           ),
           borderRadius: BorderRadius.circular(24),
           boxShadow: const [

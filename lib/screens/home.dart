@@ -3,6 +3,7 @@
 import 'package:bibleando3/providers/auth.provider.dart';
 import 'package:bibleando3/providers/bible.provider.dart';
 import 'package:bibleando3/widgets/bottomMenu.dart';
+import 'package:bibleando3/widgets/modernLoader.dart';
 import 'package:cool_alert/cool_alert.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -34,6 +35,8 @@ class _StateHomeScreen extends State<HomeScreen> {
   Object? selectedBook = ""; //"GEN";
   Object? selectedChar = ""; //"GEN.1";
   Object? selectedVerse = ""; //"GEN.1.1";
+  bool _savingFavorite = false;
+  bool _savedCurrentVerse = false;
 
   String _currentText = "Selecciona arriba los parametros de busqueda.";
 
@@ -77,7 +80,7 @@ class _StateHomeScreen extends State<HomeScreen> {
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [Color(0xFF3B45E6), Color(0xFF6676FF)],
+                    colors: [Color(0xFF4F46E5), Color(0xFF7C84FF)],
                   ),
                   borderRadius: BorderRadius.circular(24),
                 ),
@@ -86,22 +89,39 @@ class _StateHomeScreen extends State<HomeScreen> {
                     Row(
                       children: [
                         Expanded(
-                          child: Row(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: const [
-                              Text(
-                                "Bible",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 34,
-                                  fontWeight: FontWeight.bold,
+                              RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: "Bible",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 34,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: .7,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: "X",
+                                      style: TextStyle(
+                                        color: Color(0xFFFFC857),
+                                        fontSize: 36,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 1.1,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
+                              SizedBox(height: 2),
                               Text(
-                                "x",
+                                "Lectura moderna y clara",
                                 style: TextStyle(
-                                  color: Color(0xFFFF6B6B),
-                                  fontSize: 34,
-                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFFDDE2FF),
+                                  fontSize: 12,
                                 ),
                               ),
                             ],
@@ -138,11 +158,7 @@ class _StateHomeScreen extends State<HomeScreen> {
                               builder: (context, snapshot) {
                                 if (snapshot.hasError) return const Text("Error");
                                 if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2.5),
-                                  );
+                                  return const ModernLoader(size: 20);
                                 }
                                 if (snapshot.hasData &&
                                     snapshot.connectionState == ConnectionState.done) {
@@ -160,6 +176,7 @@ class _StateHomeScreen extends State<HomeScreen> {
                                       bool response = await _bibleProvider
                                           .saveSelectedVersionLocally(newValue.toString());
                                       canAddToFavorite = false;
+                                      _savedCurrentVerse = false;
                                       if (kDebugMode) print("Bible selected >$newValue");
                                       selectedBook = "";
                                       if (response) {
@@ -188,7 +205,7 @@ class _StateHomeScreen extends State<HomeScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE84B66),
+                  color: const Color(0xFFEF476F),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Row(
@@ -206,10 +223,9 @@ class _StateHomeScreen extends State<HomeScreen> {
                                 style: TextStyle(color: Colors.white));
                           }
                           if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            return const ModernLoader(
+                              size: 18,
+                              color: Colors.white,
                             );
                           }
                           if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
@@ -232,6 +248,7 @@ class _StateHomeScreen extends State<HomeScreen> {
                                     _bibleProvider.saveSelectedBook(selectedBook.toString());
                                     listCapitulos = getAllChapters();
                                     canAddToFavorite = false;
+                                    _savedCurrentVerse = false;
                                   });
                                 });
                           }
@@ -273,9 +290,7 @@ class _StateHomeScreen extends State<HomeScreen> {
                         }
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return const CircularProgressIndicator(
-                            color: Colors.red,
-                          );
+                          return const ModernLoader(size: 18);
                         }
                         if (snapshot.hasData &&
                             snapshot.connectionState == ConnectionState.done) {
@@ -307,6 +322,7 @@ class _StateHomeScreen extends State<HomeScreen> {
                                   // selectedVerse = "";
                                   listVersiculos = getAllVerses();
                                   canAddToFavorite = false;
+                                  _savedCurrentVerse = false;
                                 });
                               });
                         }
@@ -337,9 +353,7 @@ class _StateHomeScreen extends State<HomeScreen> {
                         }
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return const CircularProgressIndicator(
-                            color: Colors.red,
-                          );
+                          return const ModernLoader(size: 18);
                         }
                         if (snapshot.hasData &&
                             snapshot.connectionState == ConnectionState.done) {
@@ -370,6 +384,7 @@ class _StateHomeScreen extends State<HomeScreen> {
                                       selectedVerse.toString());
                                   refreshText();
                                   canAddToFavorite = true;
+                                  _savedCurrentVerse = false;
                                 });
                               });
                         }
@@ -446,6 +461,7 @@ class _StateHomeScreen extends State<HomeScreen> {
                             }
                             selectedVerse = dd[finalIndex].value;
                             canAddToFavorite = true;
+                            _savedCurrentVerse = false;
                             _bibleProvider
                                 .saveSelectedVerse(selectedVerse.toString());
                             refreshText();
@@ -461,61 +477,99 @@ class _StateHomeScreen extends State<HomeScreen> {
                       ),
                       GestureDetector(
                         onTap: () async {
-                          if (canAddToFavorite) {
-                            final provider = Provider.of<BibleProvider>(context,
-                                listen: false);
-                            final auth_provider = Provider.of<AuthProvider>(
-                                context,
-                                listen: false);
-                            User usr = await auth_provider.getCurrentUser();
-                            Favorite fav = Favorite();
-                            fav.bibleId =
-                                await provider.getSelectedVersionLocally();
-                            fav.bibleName =
-                                await provider.getSelectedVersionLocally();
-                            fav.text = _currentText;
-                            fav.userId = usr.uid;
-                            fav.title = await provider.getSelectedVerse();
-                            bool added = await provider.addFavorite(fav);
-                            if (added) {
-                              CoolAlert.show(
-                                  context: context,
-                                  backgroundColor: Colors.white,
-                                  type: CoolAlertType.success,
-                                  title: "Agregado",
-                                  text:
-                                      "Se ha agregado ${fav.title!} a favoritos");
-                              canAddToFavorite = false;
-                              setState(() {});
-                            } else {
-                              CoolAlert.show(
-                                  context: context,
-                                  backgroundColor: Colors.white,
-                                  type: CoolAlertType.error,
-                                  title: "Error",
-                                  text:
-                                      "No pudimos agregar a${fav.title!} a favoritos");
-                              canAddToFavorite = true;
+                          if (canAddToFavorite && !_savingFavorite) {
+                            setState(() {
+                              _savingFavorite = true;
+                            });
+                            try {
+                              final provider = Provider.of<BibleProvider>(context,
+                                  listen: false);
+                              final auth_provider = Provider.of<AuthProvider>(
+                                  context,
+                                  listen: false);
+                              User usr = await auth_provider.getCurrentUser();
+                              Favorite fav = Favorite();
+                              fav.bibleId =
+                                  await provider.getSelectedVersionLocally();
+                              fav.bibleName =
+                                  await provider.getSelectedVersionLocally();
+                              fav.text = _currentText;
+                              fav.userId = usr.uid;
+                              fav.title = await provider.getSelectedVerse();
+                              bool added = await provider.addFavorite(fav);
+                              if (added) {
+                                CoolAlert.show(
+                                    context: context,
+                                    backgroundColor: Colors.white,
+                                    type: CoolAlertType.success,
+                                    title: "Agregado",
+                                    text:
+                                        "Se ha agregado ${fav.title!} a favoritos");
+                                setState(() {
+                                  canAddToFavorite = false;
+                                  _savedCurrentVerse = true;
+                                });
+                              } else {
+                                CoolAlert.show(
+                                    context: context,
+                                    backgroundColor: Colors.white,
+                                    type: CoolAlertType.error,
+                                    title: "Error",
+                                    text:
+                                        "No pudimos agregar a${fav.title!} a favoritos");
+                                setState(() {
+                                  canAddToFavorite = true;
+                                  _savedCurrentVerse = false;
+                                });
+                              }
+                            } finally {
+                              if (mounted) {
+                                setState(() {
+                                  _savingFavorite = false;
+                                });
+                              }
                             }
                           } else {
+                            final alreadySaved = _savedCurrentVerse;
                             CoolAlert.show(
-                                backgroundColor: Colors.white,
-                                context: context,
-                                type: CoolAlertType.warning,
-                                title: "Verso invalido",
-                                text:
-                                    "Este verso ya esta entre tus favoritos o es invalido, favor seleccionar otro");
+                              backgroundColor: Colors.white,
+                              context: context,
+                              type: CoolAlertType.warning,
+                              title: alreadySaved
+                                  ? "Ya agregado"
+                                  : "Verso inválido",
+                              text: alreadySaved
+                                  ? "Este verso ya fue guardado en tus favoritos."
+                                  : "Este verso es inválido, favor seleccionar otro.",
+                            );
                           }
                         },
                         child: Padding(
                           padding: EdgeInsets.symmetric(
                               horizontal: size.width > 380 ? size.width / 5 : size.width / 8),
-                          child: Icon(
-                            canAddToFavorite ? Icons.star_rounded : Icons.star_outline_rounded,
-                            size: 44,
-                            color: canAddToFavorite
-                                ? const Color(0xFFFFA630)
-                                : Colors.grey.shade400,
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 180),
+                            child: _savingFavorite
+                                ? const ModernLoader(
+                                    key: ValueKey("saving_favorite"),
+                                    size: 22,
+                                    color: Color(0xFFFFB703),
+                                  )
+                                : Icon(
+                                    _savedCurrentVerse
+                                        ? Icons.check_circle_rounded
+                                        : canAddToFavorite
+                                            ? Icons.star_rounded
+                                            : Icons.star_outline_rounded,
+                                    key: ValueKey(
+                                        "favorite_${_savedCurrentVerse}_${canAddToFavorite}"),
+                                    size: 44,
+                                    color: _savedCurrentVerse
+                                        ? const Color(0xFF2EC4B6)
+                                        : canAddToFavorite
+                                            ? const Color(0xFFFFB703)
+                                            : Colors.grey.shade400,
+                                  ),
                           ),
                         ),
                       ),
@@ -543,6 +597,7 @@ class _StateHomeScreen extends State<HomeScreen> {
                             _bibleProvider
                                 .saveSelectedVerse(selectedVerse.toString());
                             canAddToFavorite = true;
+                            _savedCurrentVerse = false;
                             refreshText();
                           } else {
 //TODO go next chapter
