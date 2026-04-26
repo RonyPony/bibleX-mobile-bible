@@ -1,5 +1,6 @@
 import 'package:bibleando3/screens/favorites.dart';
 import 'package:bibleando3/screens/home.dart';
+import 'package:bibleando3/screens/info.dart';
 import 'package:bibleando3/screens/login.dart';
 import 'package:bibleando3/screens/register.dart';
 import 'package:bibleando3/screens/registerCompleted.dart';
@@ -14,6 +15,7 @@ final Map<String, WidgetBuilder> routes = {
   RegisterCompletedScreen.routeName: (context) => RegisterCompletedScreen(),
   HomeScreen.routeName: (context) => HomeScreen(),
   FavoriteScreen.routeName: (context) => FavoriteScreen(),
-  SettingScreen.routeName:(context) => SettingScreen()
+  SettingScreen.routeName: (context) => SettingScreen(),
+  InfoScreen.routeName: (context) => InfoScreen(),
 
 };

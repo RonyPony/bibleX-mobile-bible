@@ -8,6 +8,8 @@ Future<void> showAppAlert(
   required String title,
   required String message,
 }) async {
+  if (!context.mounted) return;
+
   final config = switch (type) {
     AppAlertType.success => (
         color: const Color(0xFF2EC4B6),
@@ -25,6 +27,8 @@ Future<void> showAppAlert(
 
   await showDialog(
     context: context,
+    useRootNavigator: true,
+    barrierDismissible: false,
     builder: (context) {
       return Dialog(
         elevation: 0,
