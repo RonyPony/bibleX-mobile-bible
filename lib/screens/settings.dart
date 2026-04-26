@@ -1,4 +1,6 @@
 import 'package:bibleando3/providers/auth.provider.dart';
+import 'package:bibleando3/constants/app_constants.dart';
+import 'package:bibleando3/screens/info.dart';
 import 'package:bibleando3/screens/login.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,9 +18,6 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingState extends State<SettingScreen> {
-  static const String _readerTextColorKey = "reader_text_color";
-  static const String _readerFontSizeKey = "reader_font_size";
-
   final List<Color> _availableColors = const [
     Color(0xFF1C2541),
     Color(0xFF2B2D42),
@@ -147,6 +146,20 @@ class _SettingState extends State<SettingScreen> {
                     },
                   ),
                 ),
+                const SizedBox(height: 16),
+                _buildCard(
+                  title: "Soporte",
+                  icon: Icons.info_outline_rounded,
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text("Información de la app"),
+                    subtitle: const Text("Correo, teléfono y versión"),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () {
+                      Navigator.pushNamed(context, InfoScreen.routeName);
+                    },
+                  ),
+                ),
               ],
             ),
     );
@@ -189,8 +202,8 @@ class _SettingState extends State<SettingScreen> {
 
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
-    final colorValue = prefs.getInt(_readerTextColorKey);
-    final fontValue = prefs.getDouble(_readerFontSizeKey);
+    final colorValue = prefs.getInt(AppConstants.readerTextColorKey);
+    final fontValue = prefs.getDouble(AppConstants.readerFontSizeKey);
     if (!mounted) return;
     setState(() {
       if (colorValue != null) {
@@ -206,12 +219,12 @@ class _SettingState extends State<SettingScreen> {
       _selectedColor = color;
     });
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_readerTextColorKey, color.value);
+    await prefs.setInt(AppConstants.readerTextColorKey, color.value);
   }
 
   Future<void> _saveFontSize(double size) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble(_readerFontSizeKey, size);
+    await prefs.setDouble(AppConstants.readerFontSizeKey, size);
   }
 
   Future<Widget> _buildLogoutBtn() async {

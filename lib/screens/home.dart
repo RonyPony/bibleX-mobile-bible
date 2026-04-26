@@ -2,6 +2,7 @@
 
 import 'package:bibleando3/providers/auth.provider.dart';
 import 'package:bibleando3/providers/bible.provider.dart';
+import 'package:bibleando3/constants/app_constants.dart';
 import 'package:bibleando3/widgets/appAlert.dart';
 import 'package:bibleando3/widgets/bottomMenu.dart';
 import 'package:bibleando3/widgets/modernLoader.dart';
@@ -41,9 +42,6 @@ class _StateHomeScreen extends State<HomeScreen> {
   bool _savedCurrentVerse = false;
   Color _readerTextColor = const Color(0xFF1C2541);
   double _readerFontSize = 25;
-
-  static const String _readerTextColorKey = "reader_text_color";
-  static const String _readerFontSizeKey = "reader_font_size";
 
   String _currentText = "Selecciona arriba los parametros de busqueda.";
 
@@ -489,6 +487,7 @@ class _StateHomeScreen extends State<HomeScreen> {
                               fav.title = await provider.getSelectedVerse();
                               bool added = await provider.addFavorite(fav);
                               if (added) {
+                                if (!mounted) return;
                                 await showAppAlert(
                                   context,
                                   type: AppAlertType.success,
@@ -501,6 +500,7 @@ class _StateHomeScreen extends State<HomeScreen> {
                                   _savedCurrentVerse = true;
                                 });
                               } else {
+                                if (!mounted) return;
                                 await showAppAlert(
                                   context,
                                   type: AppAlertType.error,
@@ -522,6 +522,7 @@ class _StateHomeScreen extends State<HomeScreen> {
                             }
                           } else {
                             final alreadySaved = _savedCurrentVerse;
+                            if (!mounted) return;
                             await showAppAlert(
                               context,
                               type: AppAlertType.warning,
@@ -742,8 +743,8 @@ class _StateHomeScreen extends State<HomeScreen> {
 
   Future<void> _loadReaderPreferences() async {
     final prefs = await SharedPreferences.getInstance();
-    final colorValue = prefs.getInt(_readerTextColorKey);
-    final fontValue = prefs.getDouble(_readerFontSizeKey);
+    final colorValue = prefs.getInt(AppConstants.readerTextColorKey);
+    final fontValue = prefs.getDouble(AppConstants.readerFontSizeKey);
     if (!mounted) return;
     setState(() {
       _readerTextColor =
