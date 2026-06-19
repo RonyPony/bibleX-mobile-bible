@@ -90,7 +90,8 @@ class _SettingState extends State<SettingScreen> {
                                 ),
                               ),
                               child: selected
-                                  ? const Icon(Icons.check, size: 18, color: Colors.white)
+                                  ? const Icon(Icons.check,
+                                      size: 18, color: Colors.white)
                                   : null,
                             ),
                           );
@@ -234,7 +235,7 @@ class _SettingState extends State<SettingScreen> {
                     border: Border.all(color: Colors.red),
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10)),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
@@ -256,7 +257,7 @@ class _SettingState extends State<SettingScreen> {
                     border: Border.all(color: Colors.red),
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10)),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
